@@ -1,0 +1,2761 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منصة مداد — حنين</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700;900&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#e8b84b; --gold-dim:rgba(212,168,82,.45); --gold-faint:rgba(212,168,82,.1);
+  --brown:#5c2a08; --brown-mid:#9a4e18;
+}
+html,body{min-height:100%}
+body{
+  font-family:'Tajawal',sans-serif;color:#fdf0d0;min-height:100vh;
+  background: radial-gradient(ellipse 90% 60% at 50% 0%,#3a1a06 0%,transparent 60%),
+              radial-gradient(ellipse 50% 50% at 15% 100%,#1e0a04 0%,transparent 55%),
+              #0e0604;
+  display:flex;flex-direction:column;position:relative;
+}
+#particlesCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;width:100%;height:100%}
+
+#loginScreen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem;background:radial-gradient(ellipse 90% 60% at 50% 0%,#2c1a08 0%,transparent 60%),#0c0602;overflow-y:auto}
+.login-content{position:relative;z-index:1;width:100%;display:flex;flex-direction:column;align-items:center;padding:20px 0}
+.login-box{width:100%;max-width:340px;border:1.5px solid rgba(212,168,82,.35);border-radius:20px;background:linear-gradient(160deg,#1a0d04,#0c0602);padding:2rem 1.5rem;text-align:center;box-shadow:0 0 60px rgba(212,168,82,.1);animation:popIn .4s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.login-icon{font-size:2.3rem;margin-bottom:.5rem}
+.login-title{font-family:'Amiri',serif;font-size:1.35rem;color:var(--gold);margin-bottom:.2rem}
+.login-sub{font-size:.7rem;color:rgba(232,184,75,.55);margin-bottom:1.3rem;line-height:1.6}
+.login-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,82,.2);border-radius:10px;color:#fdf0d0;font-family:'Tajawal',sans-serif;font-size:.95rem;padding:.65rem .9rem;outline:none;text-align:center;transition:border-color .2s;margin-bottom:.8rem}
+.login-input:focus{border-color:rgba(212,168,82,.5)}
+.login-input::placeholder{color:rgba(212,168,82,.22)}
+.login-btn{width:100%;background:linear-gradient(135deg,#5c2a08,#9a4e18,#7a3a10);border:1px solid rgba(212,168,82,.3);border-radius:10px;padding:.72rem;font-family:'Amiri',serif;font-size:1rem;font-weight:700;color:#fdf0d0;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(92,42,8,.4)}
+.login-btn:hover{transform:translateY(-2px)}
+.login-btn:active{transform:scale(.97)}
+.login-err{font-size:.75rem;color:#e57373;min-height:1.2em;margin-bottom:.6rem}
+.login-switch{font-size:.78rem;color:rgba(212,168,82,.55);margin-top:1rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.login-footer{text-align:center;margin-top:26px}
+
+.remember-row{display:flex;align-items:center;justify-content:center;gap:7px;font-size:.78rem;color:rgba(253,240,208,.55);margin-bottom:14px;cursor:pointer}
+.remember-row input{accent-color:var(--gold);width:15px;height:15px;cursor:pointer}
+
+/* ── MARQUEE ── */
+.marquee-bar{position:relative;z-index:1;width:100%;overflow:hidden;background:linear-gradient(90deg,rgba(92,42,8,.4),rgba(154,78,24,.25),rgba(92,42,8,.4));border-bottom:1px solid rgba(212,168,82,.2);padding:7px 0;display:none}
+.marquee-bar.has-content{display:block}
+.marquee-inner{display:inline-block;white-space:nowrap;font-size:.8rem;color:var(--gold);font-family:'Amiri',serif;font-style:italic;will-change:transform}
+
+/* ── AVATAR & MUSIC ── */
+.welcome-name-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
+.user-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(212,168,82,.4);background:rgba(255,255,255,.05)}
+.user-avatar:not([src]),.user-avatar[src=""]{display:none}
+
+.profile-preview{display:flex;flex-direction:column;align-items:center;margin-bottom:22px;padding-bottom:20px;border-bottom:1px dashed rgba(212,168,82,.15)}
+.profile-avatar-big{width:90px;height:90px;border-radius:50%;object-fit:cover;border:2px solid rgba(212,168,82,.4);background:rgba(255,255,255,.04);margin-bottom:10px}
+.profile-avatar-big:not([src]),.profile-avatar-big[src=""]{background:rgba(255,255,255,.04) url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgba(212,168,82,.3)"%3E%3Cpath d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.4c-3.3 0-9.8 1.6-9.8 4.9v2.5h19.6v-2.5c0-3.3-6.5-4.9-9.8-4.9z"/%3E%3C/svg%3E') center/50% no-repeat}
+.profile-name{font-family:'Amiri',serif;font-style:italic;font-size:1.2rem;color:var(--gold)}
+.mini-btn-secondary{width:100%;background:transparent;border:1px solid rgba(253,240,208,.15);border-radius:11px;padding:11px;color:rgba(253,240,208,.5);font-size:.85rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:8px}
+.mini-btn-secondary:hover{border-color:rgba(229,115,115,.35);color:#e57373}
+
+.music-btn{position:fixed;bottom:20px;left:14px;z-index:50;background:rgba(12,6,2,.85);border:1px solid rgba(240,192,96,.32);border-radius:20px;padding:6px 13px;color:rgba(253,244,216,.75);font-size:.72rem;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'Tajawal',sans-serif;backdrop-filter:blur(8px);transition:all .22s}
+.music-btn.playing{border-color:rgba(212,168,82,.5);color:var(--gold);animation:musicPulse 2s ease-in-out infinite}
+@keyframes musicPulse{0%,100%{box-shadow:0 0 0 rgba(212,168,82,0)}50%{box-shadow:0 0 12px rgba(212,168,82,.35)}}
+
+
+.brand-logo{max-width:200px;width:70%;height:auto;margin:0 auto 6px;display:block;animation:logoShimmer 3.5s ease-in-out infinite}
+@keyframes logoShimmer{
+  0%,100%{filter:brightness(1) saturate(1)}
+  50%{filter:brightness(1.05) saturate(1.05) drop-shadow(0 0 6px rgba(212,168,82,.15))}
+}
+.site-sub{font-size:.7rem;color:rgba(232,184,75,.55);letter-spacing:3px;margin-top:6px;text-transform:uppercase}
+.welcome-name{font-size:.78rem;color:rgba(253,240,208,.5);margin-top:10px}
+.welcome-name b{color:var(--gold)}
+.logout-link{font-size:.7rem;color:rgba(212,168,82,.4);text-decoration:underline;text-underline-offset:2px;cursor:pointer;margin-right:8px}
+
+.sig-text{font-family:'Amiri',serif;font-style:italic;font-size:1.05rem;background:linear-gradient(90deg,#9a4e18,#f0d080,#d4a852,#f0d080,#9a4e18);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:goldShine 3.5s linear infinite;letter-spacing:2px}
+@keyframes goldShine{from{background-position:0% center}to{background-position:200% center}}
+.copyright{font-size:.66rem;color:rgba(232,184,75,.45);margin-top:8px;letter-spacing:.5px}
+
+.tabs{display:flex;justify-content:center;gap:7px;margin:18px 0 26px;padding:0 14px;flex-wrap:wrap;position:relative;z-index:1}
+.tab{font-family:'Tajawal',sans-serif;font-size:.76rem;font-weight:700;padding:8px 14px;border-radius:10px;cursor:pointer;border:1px solid rgba(212,168,82,.2);color:rgba(253,240,208,.5);background:rgba(255,255,255,.03);transition:all .2s;position:relative}
+.tab.active{border-color:rgba(212,168,82,.4);color:#fdf0d0;background:linear-gradient(135deg,#5c2a08,#9a4e18);box-shadow:0 3px 10px rgba(92,42,8,.4)}
+.tab-badge{position:absolute;top:-6px;left:-6px;background:#c0392b;color:#fff;font-size:.62rem;font-weight:700;border-radius:10px;padding:1px 6px;min-width:16px;text-align:center}
+
+main{flex:1;max-width:560px;width:100%;margin:0 auto;padding:0 18px 110px;position:relative;z-index:1}
+.view{display:none}
+.view.active{display:block}
+
+.compose-card{background:linear-gradient(160deg,#1a0d04,#140a03);border:1px solid rgba(212,168,82,.18);border-radius:16px;padding:22px 20px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.field-label{font-size:.78rem;color:rgba(212,168,82,.6);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.field-input,.field-textarea{width:100%;background:rgba(255,255,255,.035);border:1px solid rgba(212,168,82,.18);border-radius:10px;color:#fdf0d0;font-family:'Tajawal',sans-serif;font-size:.9rem;padding:.6rem .8rem;outline:none;transition:border-color .2s;margin-bottom:14px}
+.field-input:focus,.field-textarea:focus{border-color:rgba(212,168,82,.45)}
+.field-input::placeholder,.field-textarea::placeholder{color:rgba(212,168,82,.2)}
+.char-count{font-size:.68rem;color:rgba(253,240,208,.3);text-align:left;margin-top:-10px;margin-bottom:14px}
+.recipient-status{font-size:.72rem;margin-top:-10px;margin-bottom:14px;min-height:1em}
+.recipient-status.ok{color:#81c784}
+.recipient-status.bad{color:#e57373}
+
+.recipient-row{display:flex;gap:8px;margin-bottom:6px}
+.recipient-row .field-input{margin-bottom:0;flex:1}
+.pick-btn{flex-shrink:0;background:rgba(212,168,82,.1);border:1px solid rgba(212,168,82,.3);border-radius:10px;padding:0 14px;color:var(--gold);font-size:.85rem;cursor:pointer}
+
+.editor-toolbar{display:flex;gap:6px;flex-wrap:wrap;background:rgba(255,255,255,.025);border:1px solid rgba(212,168,82,.15);border-radius:10px 10px 0 0;padding:8px 10px;border-bottom:none}
+.tool-btn{background:rgba(255,255,255,.04);border:1px solid rgba(212,168,82,.2);border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--gold);cursor:pointer;font-size:.85rem;transition:background .15s}
+.tool-btn:hover{background:rgba(212,168,82,.15)}
+.tool-btn.tool-active{background:rgba(212,168,82,.25);border-color:rgba(212,168,82,.5)}
+.tool-select{background:rgba(255,255,255,.04);border:1px solid rgba(212,168,82,.2);border-radius:6px;color:var(--gold);font-size:.75rem;padding:0 6px;height:30px}
+.emoji-pop{position:absolute;background:#1a0d04;border:1px solid rgba(212,168,82,.3);border-radius:10px;padding:8px;display:none;grid-template-columns:repeat(7,1fr);gap:4px;width:230px;max-height:220px;overflow-y:auto;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.emoji-pop.open{display:grid}
+.emoji-pop span{cursor:pointer;font-size:1.1rem;text-align:center;padding:3px;border-radius:4px}
+.emoji-pop span:hover{background:rgba(212,168,82,.15)}
+.editor-body{width:100%;min-height:110px;max-height:240px;overflow-y:auto;background:rgba(255,255,255,.035);border:1px solid rgba(212,168,82,.18);border-radius:0 0 10px 10px;color:#fdf0d0;font-family:'Tajawal',sans-serif;font-size:.9rem;padding:.7rem .8rem;outline:none;line-height:1.8}
+.editor-body:empty::before{content:attr(data-placeholder);color:rgba(212,168,82,.2)}
+.editor-body:focus{border-color:rgba(212,168,82,.45)}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.025);border:1px solid rgba(212,168,82,.12);border-radius:10px;padding:11px 14px;margin-bottom:12px;margin-top:14px}
+.toggle-label{font-size:.82rem;color:rgba(253,240,208,.85)}
+.toggle-sub{font-size:.68rem;color:rgba(253,240,208,.35);margin-top:2px}
+.switch{position:relative;width:42px;height:24px;flex-shrink:0;margin-left:10px}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.slider{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.1);border-radius:24px;transition:.25s;border:1px solid rgba(212,168,82,.2)}
+.slider::before{content:'';position:absolute;height:18px;width:18px;right:3px;left:auto;top:2px;background:#7a7a7a;border-radius:50%;transition:.25s}
+.switch input:checked + .slider{background:linear-gradient(135deg,#5c2a08,#9a4e18);border-color:rgba(212,168,82,.45)}
+.switch input:checked + .slider::before{transform:translateX(-18px);background:var(--gold)}
+
+.submit-btn{width:100%;background:linear-gradient(135deg,#5c2a08,#9a4e18,#7a3a10);border:1px solid rgba(212,168,82,.3);border-radius:12px;padding:13px;font-family:'Amiri',serif;font-weight:700;font-size:1rem;color:#fdf0d0;cursor:pointer;box-shadow:0 4px 16px rgba(92,42,8,.5);transition:transform .18s;margin-top:6px}
+.submit-btn:active{transform:scale(.97)}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed}
+
+.filter-chips{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.03);border:1px solid rgba(212,168,82,.2);border-radius:20px;padding:7px 14px;color:rgba(253,240,208,.6);font-size:.78rem;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s}
+.chip.active{background:linear-gradient(135deg,#5c2a08,#9a4e18);border-color:rgba(212,168,82,.45);color:#fdf0d0}
+.section-actions{display:flex;gap:8px;margin-bottom:14px}
+.mini-btn{flex:1;background:rgba(255,255,255,.03);border:1px solid rgba(212,168,82,.2);border-radius:9px;padding:9px;color:rgba(253,240,208,.7);font-size:.78rem;cursor:pointer;font-family:'Tajawal',sans-serif}
+.mini-btn.danger{border-color:rgba(229,115,115,.35);color:#e57373}
+
+.feed-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tile{background:linear-gradient(160deg,#1a0d04,#140a03);border:1px solid rgba(212,168,82,.18);border-radius:13px;padding:14px 13px;position:relative;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .2s, box-shadow .2s;min-height:128px;display:flex;flex-direction:column}
+.tile:active{transform:scale(.96)}
+.tile:hover{border-color:rgba(212,168,82,.4);box-shadow:0 10px 26px rgba(0,0,0,.5)}
+.tile-to{font-family:'Amiri',serif;font-style:italic;font-size:.92rem;color:var(--gold);margin-bottom:2px}
+.tile-to span{color:rgba(212,168,82,.4);font-style:normal;font-size:.62rem;display:block;letter-spacing:1px}
+.tile-date{font-size:.62rem;color:rgba(253,240,208,.3);margin-bottom:8px}
+.tile-preview{font-size:.76rem;color:rgba(253,240,208,.75);line-height:1.6;flex:1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.tile-img-flag{font-size:.7rem;color:rgba(212,168,82,.5);margin-top:6px}
+.tile-status{position:absolute;top:8px;left:8px;font-size:.6rem;border-radius:6px;padding:2px 6px}
+.tile-unread{border-color:rgba(212,168,82,.45) !important;box-shadow:0 0 0 1px rgba(212,168,82,.25)}
+.unread-dot{position:absolute;top:10px;left:10px;width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px rgba(212,168,82,.7)}
+.read-tag{position:absolute;top:8px;left:8px;font-size:.6rem;border-radius:6px;padding:2px 7px}
+.read-tag.read-yes{background:rgba(129,199,132,.12);color:#81c784;border:1px solid rgba(129,199,132,.3)}
+.read-tag.read-no{background:rgba(253,240,208,.06);color:rgba(253,240,208,.45);border:1px solid rgba(253,240,208,.15)}
+.tile-status.pending{background:rgba(224,160,80,.15);color:#e0a050;border:1px solid rgba(224,160,80,.3)}
+.tile-status.rejected{background:rgba(229,115,115,.15);color:#e57373;border:1px solid rgba(229,115,115,.3)}
+.tile-del{position:absolute;bottom:8px;left:8px;font-size:.85rem;color:rgba(229,115,115,.6);cursor:pointer;z-index:5}
+.tile-check-wrap{position:absolute;top:9px;right:9px;z-index:5;display:none}
+.tile-check-inp{width:18px;height:18px;accent-color:#f0c060;cursor:pointer}
+.tile.selectable .tile-check-wrap{display:block}
+.tile.tile-checked{border-color:rgba(240,192,96,.6) !important;background:linear-gradient(160deg,#2a1508,#1e0e04) !important}
+.select-bar{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.03);border:1px solid rgba(240,192,96,.15);border-radius:10px;padding:9px 13px;margin-bottom:12px}
+.select-bar label{font-size:.78rem;color:rgba(240,192,96,.7);cursor:pointer;display:flex;align-items:center;gap:6px}
+.select-count{font-size:.72rem;color:rgba(240,192,96,.5)}
+.del-selected-btn{background:rgba(229,115,115,.12);border:1px solid rgba(229,115,115,.38);border-radius:8px;padding:6px 16px;color:#f08080;font-size:.78rem;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s}
+.del-selected-btn:disabled{opacity:.3;cursor:not-allowed}
+
+.empty-state{text-align:center;padding:50px 20px;color:rgba(253,240,208,.35);grid-column:1/-1}
+.empty-icon{font-size:2.4rem;margin-bottom:12px;opacity:.5}
+.empty-text{font-size:.85rem;line-height:1.8}
+
+#detailModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);align-items:flex-start;justify-content:center;padding:40px 18px 18px;backdrop-filter:blur(2px);overflow-y:auto}
+#detailModal.show{display:flex}
+.detail-card{width:100%;max-width:440px;max-height:85vh;overflow-y:auto;background:linear-gradient(160deg,#1a0d04,#100802);border:1px solid rgba(212,168,82,.3);border-radius:16px;padding:24px 22px;box-shadow:0 24px 60px rgba(0,0,0,.6);animation:popIn .25s ease}
+.detail-close{position:absolute;top:14px;left:14px;z-index:5}
+.preview-banner{background:rgba(212,168,82,.12);border:1px solid rgba(212,168,82,.35);border-radius:9px;padding:8px 12px;font-size:.78rem;color:var(--gold);text-align:center;margin-top:30px;margin-bottom:10px}
+.preview-banner:not(.hidden) + .detail-top{margin-top:0}
+.detail-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;margin-top:30px}
+.detail-to{font-family:'Amiri',serif;font-style:italic;font-size:1.15rem;color:var(--gold)}
+.detail-to span{color:rgba(212,168,82,.4);font-style:normal;font-size:.68rem;display:block;margin-bottom:3px}
+.detail-date{font-size:.7rem;color:rgba(253,240,208,.3)}
+.detail-content{font-size:.92rem;line-height:2;color:rgba(253,240,208,.95);border-right:2px solid rgba(212,168,82,.3);padding-right:14px;margin-bottom:14px;word-break:break-word}
+.detail-img{width:100%;border-radius:10px;margin-bottom:14px;border:1px solid rgba(212,168,82,.15);display:block}
+.detail-audio{width:100%;margin-bottom:14px}
+.detail-video{width:100%;border-radius:10px;margin-bottom:14px;border:1px solid rgba(212,168,82,.15);display:block;max-height:320px}
+.embed-wrap{position:relative;width:100%;padding-top:56.25%;margin-bottom:14px;border-radius:10px;overflow:hidden;border:1px solid rgba(212,168,82,.15)}
+.embed-iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.embed-iframe-audio{width:100%;height:120px;border:0;border-radius:10px;margin-bottom:14px;display:block}
+.detail-footer{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px dashed rgba(212,168,82,.15)}
+.detail-from{font-size:.74rem;color:rgba(212,168,82,.5);font-style:italic;font-family:'Amiri',serif}
+.detail-reject-reason{background:rgba(229,115,115,.08);border:1px solid rgba(229,115,115,.25);border-radius:9px;padding:10px 12px;font-size:.8rem;color:#e57373;margin-top:12px}
+
+#pickerModal{display:none;position:fixed;inset:0;z-index:210;background:radial-gradient(ellipse 90% 60% at 50% 0%,#2c1a08 0%,transparent 60%),#0c0602;flex-direction:column;overflow-y:auto}
+#pickerModal.show{display:flex}
+.picker-header{display:flex;align-items:center;gap:12px;padding:18px 18px 14px;position:relative;z-index:1;border-bottom:1px solid rgba(212,168,82,.12)}
+.picker-back{background:rgba(255,255,255,.05);border:1px solid rgba(212,168,82,.25);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1.1rem;cursor:pointer;flex-shrink:0}
+.picker-title{font-family:'Amiri',serif;font-style:italic;font-size:1.1rem;color:var(--gold)}
+.picker-body{max-width:560px;width:100%;margin:0 auto;padding:18px;flex:1;display:flex;flex-direction:column;position:relative;z-index:1}
+.picker-tabs{display:flex;gap:8px;margin-bottom:14px}
+.picker-tab{flex:1;text-align:center;padding:8px;border-radius:9px;font-size:.82rem;cursor:pointer;border:1px solid rgba(212,168,82,.2);color:rgba(253,240,208,.5)}
+.picker-tab.active{background:linear-gradient(135deg,#5c2a08,#9a4e18);color:#fdf0d0;border-color:rgba(212,168,82,.4)}
+.picker-search{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(212,168,82,.2);border-radius:10px;padding:.65rem .9rem;color:#fdf0d0;font-size:.9rem;outline:none;margin-bottom:14px;font-family:'Tajawal',sans-serif}
+.picker-search::placeholder{color:rgba(212,168,82,.25)}
+.picker-list{flex:1}
+.picker-item{display:flex;justify-content:space-between;align-items:center;padding:11px 12px;border-radius:9px;cursor:pointer;font-size:.88rem;color:#fdf0d0}
+.picker-item:hover{background:rgba(212,168,82,.08)}
+.fav-star{font-size:.95rem;color:rgba(212,168,82,.3);cursor:pointer}
+.fav-star.active{color:var(--gold)}
+.picker-empty{text-align:center;padding:30px;color:rgba(253,240,208,.35);font-size:.85rem}
+
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(60px);background:linear-gradient(160deg,#1a0d04,#0c0602);border:1px solid rgba(212,168,82,.35);border-radius:12px;padding:12px 22px;font-size:.85rem;color:#fdf0d0;z-index:300;transition:transform .3s, opacity .3s;text-align:center;max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+
+footer{text-align:center;padding:24px 20px 30px;position:relative;z-index:1}
+.entertain-grid-view{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.entertain-card-item{background:linear-gradient(160deg,#1e1008,#160c04);border:1px solid rgba(240,192,96,.2);border-radius:14px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .22s;text-decoration:none;display:block;position:relative}
+.entertain-card-item::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,rgba(240,192,96,.3),transparent)}
+.entertain-card-item:hover{border-color:rgba(240,192,96,.5);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.entertain-card-item img{width:56px;height:56px;border-radius:12px;object-fit:cover;margin:0 auto 10px;display:block;border:1.5px solid rgba(240,192,96,.25);box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.entertain-card-item .e-name{font-family:'Amiri',serif;font-size:.9rem;color:#fae080;margin-bottom:4px}
+.entertain-card-item .e-desc{font-size:.65rem;color:rgba(253,244,216,.45);line-height:1.5}
+.hidden{display:none !important}
+.radio-fab{position:fixed;bottom:20px;right:14px;z-index:50;background:rgba(12,6,2,.9);border:1px solid rgba(240,192,96,.32);border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;cursor:pointer;backdrop-filter:blur(10px);transition:all .25s;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.radio-fab.playing{border-color:#f0c060;box-shadow:0 0 14px rgba(240,192,96,.35);animation:musicPulse 2s ease-in-out infinite}
+.radio-mini{position:fixed;bottom:20px;right:68px;z-index:50;background:rgba(12,6,2,.9);border:1px solid rgba(240,192,96,.25);border-radius:22px;padding:6px 12px 6px 10px;display:none;align-items:center;gap:7px;backdrop-filter:blur(10px);cursor:pointer;max-width:180px;transition:all .22s}
+.radio-mini.show{display:flex}
+.radio-mini-dot{width:6px;height:6px;border-radius:50%;background:#f0c060;animation:pulse 1.2s ease-in-out infinite;flex-shrink:0}
+.radio-mini-name{font-size:.68rem;color:#fae080;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.radio-panel{position:fixed;bottom:76px;right:14px;width:calc(100% - 28px);max-width:360px;background:linear-gradient(160deg,#1a0e04,#0e0602);border:1px solid rgba(240,192,96,.35);border-radius:20px;padding:0;z-index:100;display:none;box-shadow:0 -8px 40px rgba(0,0,0,.8);overflow:hidden}
+.radio-panel.show{display:block}
+.radio-panel-header{background:linear-gradient(90deg,rgba(80,35,8,.6),rgba(40,18,4,.8));padding:13px 15px;border-bottom:1px solid rgba(240,192,96,.12);display:flex;align-items:center;gap:8px}
+.radio-panel-title{font-family:'Amiri',serif;font-size:.95rem;color:#fae080;flex:1}
+.radio-panel-min{background:rgba(255,255,255,.06);border:1px solid rgba(240,192,96,.2);border-radius:7px;color:rgba(240,192,96,.7);font-size:.75rem;padding:4px 10px;cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap}
+.radio-now-playing{background:rgba(240,192,96,.06);border-bottom:1px solid rgba(240,192,96,.1);padding:10px 15px;display:flex;align-items:center;gap:10px;min-height:48px}
+.radio-now-disc{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3a1a06,#6a3010);border:2px solid rgba(240,192,96,.3);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.radio-now-disc.spin{animation:discSpin 3s linear infinite}
+.radio-now-info{flex:1;overflow:hidden}
+.radio-now-name{font-size:.82rem;color:#fae080;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.radio-now-country{font-size:.63rem;color:rgba(253,244,216,.4);margin-top:1px}
+.radio-tabs{display:flex;border-bottom:1px solid rgba(240,192,96,.1)}
+.radio-tab{flex:1;text-align:center;padding:8px;font-size:.75rem;cursor:pointer;color:rgba(253,244,216,.5);transition:all .18s;font-family:'Tajawal',sans-serif;border:none;background:none}
+.radio-tab.active{color:#fae080;border-bottom:2px solid #f0c060;font-weight:700}
+.radio-filter{padding:8px 12px;border-bottom:1px solid rgba(240,192,96,.08)}
+.radio-filter select{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(240,192,96,.18);border-radius:8px;color:#fdf4d8;font-family:'Tajawal',sans-serif;font-size:.78rem;padding:5px 8px;outline:none;cursor:pointer}
+.radio-filter select option{background:#1a0e04}
+.radio-stations{max-height:170px;overflow-y:auto;padding:6px 8px}
+.radio-station-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;cursor:pointer;transition:all .18s}
+.radio-station-item:hover{background:rgba(240,192,96,.07)}
+.radio-station-item.active{background:rgba(240,192,96,.1)}
+.radio-station-dot{width:6px;height:6px;border-radius:50%;background:rgba(240,192,96,.2);flex-shrink:0;transition:all .2s}
+.radio-station-item.active .radio-station-dot{background:#f0c060;box-shadow:0 0 5px rgba(240,192,96,.5)}
+.radio-station-name{font-size:.79rem;color:rgba(253,244,216,.75);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.radio-station-item.active .radio-station-name{color:#fae080;font-weight:700}
+.radio-station-country{font-size:.6rem;color:rgba(253,244,216,.3);flex-shrink:0}
+.radio-station-fav{background:none;border:none;font-size:.85rem;cursor:pointer;opacity:.4;transition:opacity .2s;padding:0 2px;flex-shrink:0}
+.radio-station-fav:hover,.radio-station-fav.active{opacity:1}
+.radio-vol-row{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid rgba(240,192,96,.08)}
+.radio-stop-btn{width:100%;background:rgba(229,115,115,.09);border:1px solid rgba(229,115,115,.25);padding:9px;color:#f08080;font-size:.78rem;cursor:pointer;font-family:'Tajawal',sans-serif;border-top:1px solid rgba(240,192,96,.08)}
+.book-card{background:linear-gradient(160deg,#1e1008,#160c04);border:1px solid rgba(240,192,96,.18);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .22s}
+.book-card:hover{border-color:rgba(240,192,96,.45);transform:translateY(-2px)}
+.book-cover{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:linear-gradient(160deg,#2a1508,#1e0e04)}
+.book-cover-placeholder{width:100%;aspect-ratio:2/3;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#2a1508,#1e0e04);font-size:2rem}
+.book-info{padding:7px 8px}
+.book-title{font-family:'Amiri',serif;font-size:.75rem;color:#fae080;margin-bottom:2px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.book-author{font-size:.6rem;color:rgba(253,244,216,.4)}
+.surprise-tile{background:linear-gradient(160deg,#1e1008,#100602);border:1px solid rgba(240,192,96,.2);border-radius:16px;padding:16px;margin-bottom:10px;text-align:center;position:relative;overflow:hidden}
+.surprise-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(240,192,96,.4),transparent)}
+.surprise-box-icon{font-size:2.8rem;display:block;margin:8px auto;animation:floatBox 2s ease-in-out infinite}
+.surprise-open-btn{background:linear-gradient(135deg,#6a2e0a,#b05520);border:1px solid rgba(240,192,96,.4);border-radius:10px;padding:9px 20px;color:#fff8e0;font-size:.85rem;cursor:pointer;font-family:'Tajawal',sans-serif;margin-top:8px}
+.members-section{margin-bottom:18px}
+.haneen-name{font-family:'Amiri',serif;font-style:italic;background:linear-gradient(90deg,#9a4e18,#f0d080,#d4a852,#f0d080,#9a4e18);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:goldShine 3.5s linear infinite;letter-spacing:1px}
+@keyframes goldShine{from{background-position:0% center}to{background-position:200% center}}
+.reactions-bar{display:flex;gap:5px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(240,192,96,.08);margin-top:8px}
+.replies-section{margin-top:8px;border-top:1px solid rgba(240,192,96,.08);padding-top:8px}
+.replies-toggle{background:none;border:none;color:rgba(240,192,96,.6);font-size:.75rem;cursor:pointer;padding:2px 6px;font-family:'Amiri',serif}
+.replies-list{display:none;flex-direction:column;gap:6px;margin-top:6px}
+.replies-list.open{display:flex}
+.reply-item{background:rgba(255,255,255,.03);border-radius:8px;padding:6px 10px;font-size:.78rem;color:rgba(253,244,216,.8);display:flex;align-items:flex-start;gap:8px}
+.reply-author{color:rgba(240,192,96,.8);font-family:'Amiri',serif;font-size:.75rem;margin-bottom:2px}
+.reply-text{flex:1}
+.reply-del-btn{background:none;border:none;color:rgba(229,115,115,.6);cursor:pointer;font-size:.75rem;padding:0 4px;display:none}
+.reply-del-btn.visible{display:block}
+.reply-input-wrap{display:flex;gap:6px;margin-top:6px}
+.reply-input{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(240,192,96,.2);border-radius:20px;padding:5px 12px;color:#fdf4d8;font-size:.78rem;outline:none;font-family:'Amiri',serif}
+.reply-send-btn{background:rgba(240,192,96,.15);border:1px solid rgba(240,192,96,.3);border-radius:20px;padding:5px 12px;color:#fae080;font-size:.78rem;cursor:pointer}
+.members-group-title{font-family:'Amiri',serif;font-size:.88rem;color:rgba(240,192,96,.7);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(240,192,96,.1)}
+.members-count{background:rgba(240,192,96,.15);border-radius:10px;padding:1px 8px;font-size:.75rem;color:#fae080;margin-right:6px}
+.member-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:10px;margin-bottom:6px}
+.member-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(212,168,82,.3)}
+.member-avatar-placeholder{width:32px;height:32px;border-radius:50%;background:rgba(212,168,82,.15);display:flex;align-items:center;justify-content:center;font-size:.9rem;border:1px solid rgba(212,168,82,.2)}
+.member-name{font-family:'Amiri',serif;font-size:.88rem;color:#fdf4d8;flex:1}
+.member-status-dot{width:8px;height:8px;border-radius:50%;background:#4caf50}
+.books-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.book-card{background:linear-gradient(160deg,#1e1008,#160c04);border:1px solid rgba(240,192,96,.18);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .22s}
+.book-card:hover{border-color:rgba(240,192,96,.45);transform:translateY(-2px)}
+</style>
+</head>
+<body>
+
+<canvas id="particlesCanvas"></canvas>
+
+<div id="loginScreen">
+  <div class="login-content">
+
+    <!-- شاشة الدخول العادي -->
+    <div class="login-box" id="loginBoxNormal">
+      <img src="midad-logo.png" alt="مِداد" style="width:80px;height:80px;object-fit:contain;margin:0 auto .6rem;display:block;filter:drop-shadow(0 0 8px rgba(240,192,96,.3))">
+      <div class="login-title">الدخول إلى مِداد</div>
+      <div class="login-sub">أدخل اسمك وكلمة المرور الخاصة بحسابك</div>
+      <div class="login-err" id="loginErr"></div>
+      <input class="login-input" id="loginName" placeholder="اسمك في المنتدى" maxlength="30" autocomplete="off">
+      <input class="login-input" id="loginPass" type="password" placeholder="كلمة المرور" maxlength="40" autocomplete="off">
+      <label class="remember-row">
+        <input type="checkbox" id="rememberMe" checked>
+        <span>تذكرني على هذا الجهاز</span>
+      </label>
+      <button class="login-btn" id="loginBtn">دخول</button>
+      <div class="login-switch" id="showInviteBtn">ليس لديك حساب بعد؟ سجّل بكود الدعوة</div>
+      <div class="login-switch" id="showRecoveryBtn" style="margin-top:6px;color:rgba(240,192,96,.5);font-size:.73rem">نسيت كلمة المرور؟</div>
+      <div class="login-switch" id="showContactBtn" style="margin-top:6px;color:rgba(240,192,96,.45);font-size:.73rem">📩 تواصل مع الإدارة</div>
+    </div>
+
+    <!-- شاشة التسجيل بكود الدعوة -->
+    <div class="login-box hidden" id="loginBoxInvite">
+      <img src="midad-logo.png" alt="مِداد" style="width:80px;height:80px;object-fit:contain;margin:0 auto .6rem;display:block;filter:drop-shadow(0 0 8px rgba(240,192,96,.3))">
+      <div class="login-title">التسجيل بكود الدعوة</div>
+      <div class="login-sub">منصة مداد بدعوة فقط<br>أدخل الكود الذي حصلت عليه ثم اختر اسمك وكلمة مرورك</div>
+      <div class="login-err" id="inviteErr"></div>
+      <input class="login-input" id="inviteCode" placeholder="كود الدعوة" maxlength="20" autocomplete="off" style="letter-spacing:3px;text-align:center">
+      <input class="login-input" id="inviteName" placeholder="اسمك في المنتدى" maxlength="30" autocomplete="off">
+      <input class="login-input" id="invitePass" type="password" placeholder="اختر كلمة مرور (٤ أحرف فأكثر)" maxlength="40" autocomplete="off">
+      <select class="login-input" id="secretQuestion" style="cursor:pointer;background:#1e1008;color:#f0c060;border-color:rgba(240,192,96,.32)">
+        <option value="">— اختر سؤالاً سرياً —</option>
+        <option value="q1">ما اسم أول مدرسة دخلتها؟</option>
+        <option value="q2">ما اسم أفضل صديق في طفولتك؟</option>
+        <option value="q3">ما اسم المدينة التي وُلدت فيها؟</option>
+        <option value="q4">ما هو لقبك المفضل في الطفولة؟</option>
+        <option value="q5">ما اسم حيوانك الأليف الأول؟</option>
+        <option value="q6">ما هو طبقك المفضل؟</option>
+        <option value="q7">ما هو اسم مدينتك المفضلة؟</option>
+      </select>
+      <input class="login-input" id="secretAnswer" placeholder="إجابة السؤال السري" maxlength="60" autocomplete="off">
+      <button class="login-btn" id="registerBtn">تسجيل وإنشاء الحساب</button>
+      <div class="login-switch" id="showLoginBtn">لديك حساب بالفعل؟ سجّل الدخول</div>
+    </div>
+
+    <!-- شاشة التواصل مع الإدارة (من خارج التطبيق) -->
+    <div class="login-box hidden" id="loginBoxContact">
+      <div class="login-icon">📩</div>
+      <div class="login-title">التواصل مع الإدارة</div>
+      <div class="login-sub">أرسل رسالتك وسنردّ عليك في أقرب وقت</div>
+      <div class="login-err" id="contactErr"></div>
+      <input class="login-input" id="contactName" placeholder="اسمك (اختياري)" maxlength="30" autocomplete="off">
+      <textarea class="login-input" id="contactMsg" placeholder="اكتب رسالتك هنا..." maxlength="500" rows="4" style="resize:none;line-height:1.7;text-align:right"></textarea>
+      <button class="login-btn" id="contactSendBtn">إرسال الرسالة</button>
+      <div class="login-switch" id="showLoginFromContact" style="margin-top:8px">العودة</div>
+    </div>
+
+    <!-- شاشة استعادة كلمة المرور -->
+    <div class="login-box hidden" id="loginBoxRecovery">
+      <div class="login-icon">🔑</div>
+      <div class="login-title">استعادة كلمة المرور</div>
+      <div class="login-sub">أدخل اسمك وأجب على سؤالك السري لإرسال طلب الاستعادة</div>
+      <div class="login-err" id="recoveryErr"></div>
+      <input class="login-input" id="recoveryName" placeholder="اسمك في المنتدى" maxlength="30" autocomplete="off">
+      <div id="recoveryQuestionBox" class="hidden">
+        <div style="background:rgba(240,192,96,.06);border:1px solid rgba(240,192,96,.2);border-radius:10px;padding:.65rem .9rem;font-size:.85rem;color:rgba(253,244,216,.7);margin-bottom:.8rem;text-align:center" id="recoveryQuestionText"></div>
+        <input class="login-input" id="recoveryAnswer" placeholder="إجابة السؤال السري" maxlength="60" autocomplete="off">
+      </div>
+      <!-- حالة الطلب -->
+      <div id="recoveryStatusBox" class="hidden" style="border-radius:11px;padding:12px 15px;margin-bottom:14px;font-size:.82rem;line-height:1.7;text-align:center"></div>
+      <!-- كلمة المرور الجديدة -->
+      <div id="recoveryNewPassBox" class="hidden" style="background:rgba(240,192,96,.07);border:1px solid rgba(240,192,96,.38);border-radius:11px;padding:14px 16px;margin-bottom:16px;text-align:center">
+        <div style="font-size:.72rem;color:rgba(240,192,96,.6);margin-bottom:6px">كلمة مرورك الجديدة</div>
+        <div id="recoveryNewPassValue" style="font-family:monospace;font-size:1.4rem;color:#fae080;letter-spacing:3px"></div>
+        <div style="font-size:.68rem;color:rgba(240,192,96,.45);margin-top:6px">يُنصح بتغييرها فور تسجيل الدخول</div>
+      </div>
+      <button class="login-btn" id="recoveryBtn">التحقق من الاسم</button>
+      <div class="login-switch" id="showLoginFromRecovery" style="margin-top:8px">العودة لتسجيل الدخول</div>
+    </div>
+
+    <div class="login-footer">
+      <div class="sig-text">~ حنين ~</div>
+      <div class="copyright">جميع الحقوق محفوظة لمنتديات مسك الغلا</div>
+    </div>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+
+  <div class="marquee-bar" id="marqueeBar">
+    <div class="marquee-track" id="marqueeTrack"></div>
+  </div>
+
+  <header>
+    <img class="brand-logo" src="midad-logo.png" alt="مِداد">
+    <div class="welcome-name-row">
+      <img class="user-avatar" id="userAvatarImg" src="" alt="">
+      <div class="welcome-name">أهلاً، <b id="userNameDisplay"></b> · <span class="logout-link" id="logoutBtn">خروج</span></div>
+    </div>
+    <button class="music-btn" id="musicToggleBtn">
+      <span id="musicIcon">🔇</span> <span id="musicLabel">موسيقى</span>
+    </button>
+    <audio id="bgMusic" loop preload="none"></audio>
+  </header>
+
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-view="publicView">📜 العامة</div>
+    <div class="tab" data-view="composeView">✍ أرسل</div>
+    <div class="tab" data-view="inboxView">📬 صندوقي<span class="tab-badge hidden" id="inboxBadge">0</span></div>
+    <div class="tab" data-view="sentView">📤 المرسلة</div>
+    <div class="tab" data-view="profileView">👤 ملفي</div>
+    <div class="tab" data-view="entertainView">🎮 الترفيه</div>
+    <div class="tab" data-view="libraryView">📚 المكتبة</div>
+    <div class="tab" data-view="surpriseView">🎁 المفاجآت<span class="tab-badge hidden" id="surpriseBadge">0</span></div>
+  </div>
+
+  <main>
+
+    <div class="view active" id="publicView">
+      <div class="filter-chips">
+        <button class="chip active" data-filter="all">الكل</button>
+        <button class="chip" data-filter="img">🖼️ صور</button>
+        <button class="chip" data-filter="audio">🎵 صوت</button>
+        <button class="chip" data-filter="video">🎬 فيديو</button>
+      </div>
+      <div class="feed-grid" id="publicFeed"></div>
+    </div>
+
+    <div class="view" id="composeView">
+      <div class="compose-card">
+        <label class="field-label">إلى (اسم العضو في المنتدى)</label>
+        <div class="recipient-row">
+          <input class="field-input" id="toName" placeholder="اكتب اسم المستلم..." maxlength="30">
+          <button class="pick-btn" id="openPickerBtn" type="button">👥 اختر</button>
+        </div>
+        <div class="recipient-status" id="recipientStatus"></div>
+
+        <label class="field-label">الرسالة</label>
+
+        <div style="position:relative">
+          <div class="editor-toolbar">
+            <button type="button" class="tool-btn" id="boldBtn" title="غامق"><b>B</b></button>
+            <button type="button" class="tool-btn" id="italicBtn" title="مائل"><i>I</i></button>
+            <select class="tool-select" id="fontSizeSel" title="حجم الخط">
+              <option value="2">صغير</option>
+              <option value="3" selected>عادي</option>
+              <option value="5">كبير</option>
+              <option value="7">ضخم</option>
+            </select>
+            <input type="color" id="fontColorSel" value="#fdf0d0" title="لون الخط" style="width:30px;height:30px;border:1px solid rgba(212,168,82,.2);border-radius:6px;background:none;padding:2px;cursor:pointer">
+            <button type="button" class="tool-btn" id="emojiBtn" title="إيموجي">😊</button>
+            <div class="emoji-pop" id="emojiPop"></div>
+          </div>
+          <div class="editor-body" id="msgEditor" contenteditable="true" data-placeholder="اكتب رسالتك هنا..."></div>
+        </div>
+        <div class="char-count"><span id="charCount">0</span> / 500</div>
+
+        <label class="field-label">رابط صورة (اختياري)</label>
+        <input class="field-input" id="imgUrl" placeholder="https://..." style="margin-bottom:6px">
+        <div class="char-count" style="margin-top:0">يمكنك رفع الصورة على أي موقع استضافة صور ولصق الرابط هنا</div>
+
+        <label class="field-label">رابط صوت (اختياري)</label>
+        <input class="field-input" id="audioUrl" placeholder="https://..." style="margin-bottom:14px">
+
+        <label class="field-label">رابط فيديو (اختياري)</label>
+        <input class="field-input" id="videoUrl" placeholder="https://..." style="margin-bottom:14px">
+
+        <div class="toggle-row">
+          <label class="switch">
+            <input type="checkbox" id="showNameToggle">
+            <span class="slider"></span>
+          </label>
+          <div style="flex:1">
+            <div class="toggle-label">إظهار اسمي للمستلم</div>
+            <div class="toggle-sub">إن لم تُفعّله ستصل الرسالة من "مجهول"</div>
+          </div>
+        </div>
+
+        <div class="toggle-row">
+          <label class="switch">
+            <input type="checkbox" id="showPublicToggle" checked>
+            <span class="slider"></span>
+          </label>
+          <div style="flex:1">
+            <div class="toggle-label">عرضها في الصفحة العامة</div>
+            <div class="toggle-sub">بعد الاعتماد، يراها الجميع وليس المستلم فقط</div>
+          </div>
+        </div>
+
+        <button class="mini-btn-secondary" id="previewBtn" style="margin-top:14px">👁 معاينة الرسالة قبل الإرسال</button>
+        <button class="submit-btn" id="sendBtn">إرسال الرسالة ✉</button>
+      </div>
+    </div>
+
+    <div class="view" id="inboxView">
+      <input class="field-input" id="inboxSearch" placeholder="🔍 ابحث في رسائلك..." style="margin-bottom:12px">
+      <div class="select-bar">
+        <label><input type="checkbox" id="inboxSelectAll" class="tile-check-inp"> تحديد الكل</label>
+        <span class="select-count" id="inboxSelCount">٠ محدد</span>
+        <button class="del-selected-btn" id="inboxDelBtn" disabled>🗑 حذف</button>
+      </div>
+      <div class="feed-grid" id="inboxFeed"></div>
+    </div>
+
+    <div class="view" id="sentView">
+      <input class="field-input" id="sentSearch" placeholder="🔍 ابحث في رسائلك المرسلة..." style="margin-bottom:12px">
+      <div class="select-bar">
+        <label><input type="checkbox" id="sentSelectAll" class="tile-check-inp"> تحديد الكل</label>
+        <span class="select-count" id="sentSelCount">٠ محدد</span>
+        <button class="del-selected-btn" id="sentDelBtn" disabled>🗑 حذف</button>
+      </div>
+      <div class="feed-grid" id="sentFeed"></div>
+    </div>
+
+    <div class="view" id="profileView">
+      <div style="text-align:center;margin-bottom:16px"><button class="submit-btn" id="openContactAppBtn" style="max-width:200px;padding:10px;font-size:.88rem">📩 تواصل مع الإدارة</button></div>
+      <div class="compose-card">
+        <div class="profile-preview">
+          <img class="profile-avatar-big" id="profileAvatarBig" src="" alt="">
+          <div class="profile-name" id="profileNameDisplay"></div>
+        </div>
+
+        <label class="field-label">رابط صورتك الرمزية</label>
+        <input class="field-input" id="avatarUrlInput" placeholder="https://...">
+        <div class="char-count" style="margin-top:0">ضع رابط صورة من أي موقع استضافة صور، أو اتركها فارغة لإزالة الصورة</div>
+
+        <button class="submit-btn" id="saveAvatarBtn">💾 حفظ الصورة الرمزية</button>
+        <button class="mini-btn-secondary" id="removeAvatarBtn">إزالة الصورة الحالية</button>
+      </div>
+
+      <!-- قائمة الأعضاء -->
+      <div style="margin-top:20px">
+        <button onclick="window.toggleMembersList()" style="width:100%;background:rgba(240,192,96,.1);border:1px solid rgba(240,192,96,.25);border-radius:12px;padding:10px;color:#fae080;font-family:'Amiri',serif;font-size:.9rem;cursor:pointer" id="membersToggleBtn">👥 عرض الأعضاء</button>
+        <div id="membersDropdown" style="display:none;margin-top:10px">
+          <div class="members-section">
+            <div class="members-group-title">🟢 متواجدون الآن <span class="members-count" id="onlineCount">0</span></div>
+            <div class="members-list" id="onlineList"></div>
+          </div>
+          <div class="members-section">
+            <div class="members-group-title">🕐 آخر 24 ساعة <span class="members-count" id="recentCount">0</span></div>
+            <div class="members-list" id="recentList"></div>
+          </div>
+          <div class="members-section">
+            <div class="members-group-title">👥 جميع الأعضاء <span class="members-count" id="allCount">0</span></div>
+            <div class="members-list" id="allList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ركن الترفيه -->
+    <div class="view" id="entertainView">
+      <div id="entertainGrid" class="entertain-grid-view"></div>
+      <div id="entertainEmpty" class="empty-state hidden"><div class="empty-icon">🎮</div><div class="empty-text">لا توجد روابط بعد</div></div>
+    </div>
+
+
+<!-- المكتبة -->
+    <div class="view" id="libraryView">
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <input class="field-input" id="librarySearch" placeholder="🔍 ابحث باسم الكتاب أو المؤلف..." style="flex:1">
+      </div>
+      <div style="display:flex;gap:7px;margin-bottom:14px">
+        <button class="chip active" id="libTabAll" onclick="setLibTab('all')">الكل</button>
+        <button class="chip" id="libTabNovel" onclick="setLibTab('novel')">روايات</button>
+        <button class="chip" id="libTabOther" onclick="setLibTab('other')">كتب منوعة</button>
+      </div>
+      <div class="books-grid" id="booksGrid"></div>
+      <div class="empty-state hidden" id="booksEmpty"><div class="empty-icon">📚</div><div class="empty-text">لا توجد كتب</div></div>
+      <button class="upload-btn" id="suggestBookBtn">📤 اقتراح كتاب للمكتبة</button>
+    </div>
+
+    <!-- صندوق المفاجآت -->
+    <div class="view" id="surpriseView">
+      <!-- خانة اختيار العضو -->
+      <label class="field-label">إلى (اسم العضو)</label>
+      <div class="recipient-row" style="margin-bottom:6px">
+        <input class="field-input" id="surpriseToInput" placeholder="اكتب اسم العضو..." maxlength="30" autocomplete="off">
+        <button class="pick-btn" type="button" onclick="surprisePickerMode=true;allMembersCache=allMembersCache.filter(function(m){return m.key!=='__everyone__';});document.getElementById('surprisePickerFooter').style.display='none';document.getElementById('pickerSearch').value='';document.getElementById('pickerModal').classList.add('show');renderPickerList();">👥 اختر</button>
+      </div>
+      <div class="recipient-status" id="surpriseRecipientStatus"></div>
+      <!-- خيار إظهار الاسم -->
+      <div class="toggle-row" style="margin-top:10px;margin-bottom:4px">
+        <label class="switch">
+          <input type="checkbox" id="surpriseShowSender2" checked>
+          <span class="slider"></span>
+        </label>
+        <div style="flex:1">
+          <div class="toggle-label">إظهار اسمي للمستلم</div>
+        </div>
+      </div>
+      <button class="submit-btn" style="margin-bottom:20px" onclick="doSendSurprise(this)">🎁 إرسال مفاجأة</button>
+      <!-- الواردة والمرسلة -->
+      <div style="display:flex;gap:7px;margin-bottom:14px">
+        <button class="chip active" id="surpriseTabInbox" onclick="setSurpriseTab('inbox')">📬 الواردة</button>
+        <button class="chip" id="surpriseTabSent" onclick="setSurpriseTab('sent')">📤 المرسلة</button>
+      </div>
+      <div id="surpriseInboxFeed"></div>
+      <div id="surpriseSentFeed" style="display:none"></div>
+    </div>
+
+    <div class="view" id="surpriseView">
+      <!-- خانة اختيار العضو -->
+      <label class="field-label">إلى (اسم العضو)</label>
+      <div class="recipient-row" style="margin-bottom:6px">
+        <input class="field-input" id="surpriseToInput" placeholder="اكتب اسم العضو..." maxlength="30" autocomplete="off">
+        <button class="pick-btn" type="button" onclick="surprisePickerMode=true;allMembersCache=allMembersCache.filter(function(m){return m.key!=='__everyone__';});document.getElementById('surprisePickerFooter').style.display='none';document.getElementById('pickerSearch').value='';document.getElementById('pickerModal').classList.add('show');renderPickerList();">👥 اختر</button>
+      </div>
+
+  </main>
+
+  <!-- المساحة الإعلانية -->
+  <div id="adSpaceSection" class="hidden" style="max-width:560px;width:100%;margin:0 auto 16px;padding:0 16px;position:relative;z-index:1">
+    <div id="adSpaceInner" style="background:linear-gradient(160deg,#1e1008,#160c04);border:1px solid rgba(240,192,96,.22);border-radius:16px;overflow:hidden"></div>
+  </div>
+
+  <footer>
+    <div class="sig-text">~ حنين ~</div>
+    <div class="copyright">جميع الحقوق محفوظة لمنتديات مسك الغلا</div>
+  </footer>
+
+</div>
+
+<!-- Contact Modal (داخل التطبيق) -->
+<div id="contactModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(5px)">
+  <div style="width:100%;max-width:400px;background:linear-gradient(160deg,#1e1008,#100602);border:1px solid rgba(240,192,96,.38);border-radius:22px;padding:26px 22px;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.8)">
+    <div style="position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(240,192,96,.6),transparent)"></div>
+    <button onclick="document.getElementById('contactModal').style.display='none'" style="position:absolute;top:12px;left:12px;background:rgba(255,255,255,.06);border:1px solid rgba(240,192,96,.25);border-radius:8px;color:rgba(253,244,216,.7);width:32px;height:32px;cursor:pointer;font-size:1rem">✕</button>
+    <div style="text-align:center;font-family:'Amiri',serif;font-style:italic;font-size:1.2rem;color:#fae080;margin-bottom:6px;margin-top:8px">📩 تواصل مع الإدارة</div>
+    <div style="text-align:center;font-size:.75rem;color:rgba(240,192,96,.55);margin-bottom:18px">سنردّ عليك في أقرب وقت</div>
+    <div id="contactAppErr" style="font-size:.75rem;color:#f08080;min-height:1.2em;margin-bottom:8px;text-align:center"></div>
+    <textarea id="contactAppMsg" placeholder="اكتب رسالتك هنا..." maxlength="500" rows="4" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(240,192,96,.25);border-radius:10px;color:#fdf4d8;font-family:'Tajawal',sans-serif;font-size:.9rem;padding:.7rem .9rem;outline:none;resize:none;line-height:1.7;margin-bottom:12px"></textarea>
+    <button id="contactAppSendBtn" style="width:100%;background:linear-gradient(160deg,#7a3210,#c06028,#8a3c14);border:1px solid rgba(240,192,96,.55);border-radius:11px;padding:.78rem;font-family:'Amiri',serif;font-size:1rem;font-weight:700;color:#fff8e0;cursor:pointer;box-shadow:0 5px 20px rgba(90,30,6,.55)">إرسال</button>
+  </div>
+</div>
+
+<div id="detailModal">
+  <div class="detail-card" style="position:relative">
+    <span class="detail-close mini-btn" style="position:absolute;width:auto;padding:4px 10px;cursor:pointer" id="closeDetailBtn">✕</span>
+    <div class="preview-banner hidden" id="detailPreviewBanner">👁 معاينة — هذه ليست الرسالة الفعلية بعد</div>
+    <div class="detail-top">
+      <div class="detail-to"><span id="detailToLabel">إلى</span><span id="detailTo"></span></div>
+      <div class="detail-date" id="detailDate"></div>
+    </div>
+    <div class="detail-content" id="detailContent"></div>
+    <img class="detail-img hidden" id="detailImg" alt="">
+    <div id="detailAudioWrap"></div>
+    <div id="detailVideoWrap"></div>
+    <div class="detail-footer">
+      <div class="detail-from" id="detailFrom"></div>
+      <div id="detailStatusBadge"></div>
+    </div>
+    <div class="detail-reject-reason hidden" id="detailRejectReason"></div>
+    <div style="margin-top:14px" id="detailDeleteWrap"></div>
+  </div>
+</div>
+
+<div id="pickerModal">
+  <div class="picker-header">
+    <div class="picker-back" id="pickerBackBtn">→</div>
+    <div class="picker-title">اختر مستلماً</div>
+  </div>
+  <div class="picker-body">
+    <div class="picker-tabs">
+      <div class="picker-tab active" data-ptab="favorites">⭐ المفضلة</div>
+      <div class="picker-tab" data-ptab="all">👥 كل الأعضاء</div>
+    </div>
+    <input class="picker-search" id="pickerSearch" placeholder="ابحث عن اسم...">
+    <div class="picker-list" id="pickerList"></div>
+  </div>
+  <div id="surprisePickerFooter" style="display:none;padding:12px 16px;border-top:1px solid rgba(240,192,96,.15)">
+    <button id="surpriseConfirmFromPicker" class="submit-btn" style="opacity:.5" disabled>🎁 إرسال المفاجأة</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyDLyFbQ5GpMYWYvCw2fSq7eAMkxo0X1nwE",
+  authDomain:"secret-mailbox-a73ab.firebaseapp.com",
+  databaseURL:"https://secret-mailbox-a73ab-default-rtdb.firebaseio.com",
+  projectId:"secret-mailbox-a73ab",
+  storageBucket:"secret-mailbox-a73ab.firebasestorage.app",
+  messagingSenderId:"693523872316",
+  appId:"1:693523872316:web:1e9dfc503983b377876139"
+});
+var db = firebase.database();
+function escapeHtml(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function formatName(name){ if(!name) return ''; var e=escapeHtml(name); return name==='حنين'?'<span class="haneen-name">'+e+'</span>':e; }
+window.addEventListener('load', function(){ if(typeof loadMarquee==='function') loadMarquee(); if(typeof loadMusicSetting==='function') loadMusicSetting(); });
+
+var THIRTY_DAYS_MS = 30*24*60*60*1000;
+var EMOJI_LIST = [
+  '😀','😁','😂','🤣','😊','😇','🙂','🙃','😉','😍','🥰','😘','😗','😋','😜','🤪','😎','🥳','🤩','🤔',
+  '😐','😑','😶','🙄','😏','😣','😥','😮','🤐','😯','😪','😴','😌','😛','😝','🤤','😒','😓','😔','😕',
+  '🙁','😟','😢','😭','😤','😠','😡','🤬','😨','😰','😱','😳','🥺','😬','🙀','😷','🤒','🤕','🤒','🥵',
+  '🥶','😵','🤯','🤠','🥸','😎','🤓','🧐','😈','👿','💀','👻','🤡','💩','🤖','🎃',
+  '❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','♥️',
+  '👍','👎','👏','🙌','🙏','🤝','✌️','🤞','🤟','🤘','👌','🤙','💪','🫶','👐','🤲','✋','🖐️','🖖','👋',
+  '🌹','🌸','🌺','🌻','🌼','🌷','💐','🌿','🍀','🌳','🌙','⭐','✨','💫','🌟','☀️','⛅','🌧️','❄️','🔥',
+  '☕','🍵','🍷','🍫','🍰','🎂','🍓','🍉','🍎','🌶️',
+  '✉️','💌','📩','📬','🎁','🎉','🎊','🎈','🏆','🥇','💎','🔔','📿','🕊️','⏳','🔑','💡','🎵','🎶','📌'
+];
+
+async function hashPass(text){
+  var enc = new TextEncoder().encode(text);
+  var buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+
+var currentUser = null;
+var recipientCheckTimeout = null;
+var allMembersCache = [];
+var favoritesCache = [];
+var pickerActiveTab = 'favorites';
+var surprisePickerMode = false;
+var surpriseSelectedKey = null;
+var surpriseSelectedName = null;
+
+function nameKey(name){ return name.trim().toLowerCase().replace(/\s+/g,'_'); }
+
+(function(){
+  var canvas = document.getElementById('particlesCanvas');
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var w=0, h=0;
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function makeParticle(){
+    return {
+      x: Math.random()*w,
+      y: Math.random()*h,
+      r: Math.random()*3 + 1,
+      speed: Math.random()*0.25 + 0.05,
+      drift: (Math.random()-0.5)*0.15,
+      alpha: Math.random()*0.5 + 0.2,
+      flicker: Math.random()*0.015 + 0.003,
+      phase: Math.random()*Math.PI*2
+    };
+  }
+
+  var COUNT = 38;
+  for(var i=0;i<COUNT;i++) particles.push(makeParticle());
+
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    var t = Date.now()*0.001;
+    particles.forEach(function(p){
+      p.y -= p.speed;
+      p.x += p.drift;
+      if(p.y < -10){ p.y = h+10; p.x = Math.random()*w; }
+      if(p.x < -10) p.x = w+10;
+      if(p.x > w+10) p.x = -10;
+
+      var flick = 0.7 + 0.3*Math.sin(t*2 + p.phase);
+      var a = p.alpha * flick;
+
+      var grad = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*4);
+      grad.addColorStop(0, 'rgba(212,168,82,'+a+')');
+      grad.addColorStop(1, 'rgba(212,168,82,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r*4,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(253,240,208,'+(a*0.9)+')';
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r*0.6,0,Math.PI*2);
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+var toastTimer = null;
+function toast(msg, dur){
+  var t=document.getElementById('toast');
+  if(toastTimer){ clearTimeout(toastTimer); toastTimer=null; }
+  t.textContent=msg;
+  // force show on next frame to guarantee transition restarts
+  t.classList.remove('show');
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      t.classList.add('show');
+      toastTimer = setTimeout(function(){
+        t.classList.remove('show');
+        toastTimer = null;
+      }, dur||2800);
+    });
+  });
+}
+
+/* ══ LOGIN / INVITE TOGGLE ══ */
+document.getElementById('showInviteBtn').addEventListener('click', function(){
+  document.getElementById('loginBoxNormal').classList.add('hidden');
+  document.getElementById('loginBoxInvite').classList.remove('hidden');
+});
+document.getElementById('showLoginBtn').addEventListener('click', function(){
+  document.getElementById('loginBoxInvite').classList.add('hidden');
+  document.getElementById('loginBoxNormal').classList.remove('hidden');
+});
+
+/* ══ NORMAL LOGIN (existing users only) ══ */
+document.getElementById('loginBtn').addEventListener('click', async function(){
+  var name = document.getElementById('loginName').value.trim();
+  var pass = document.getElementById('loginPass').value;
+  var remember = document.getElementById('rememberMe').checked;
+  var errEl = document.getElementById('loginErr');
+  errEl.textContent='';
+
+  if(!name){ errEl.textContent='أدخل اسمك أولاً'; return; }
+  if(!pass){ errEl.textContent='أدخل كلمة المرور'; return; }
+
+  var key = nameKey(name);
+  var hash = await hashPass(pass);
+
+  this.disabled = true;
+  this.textContent = 'جارٍ التحقق...';
+
+  try{
+    var snap = await db.ref('postman_users/'+key).get();
+
+    if(!snap.exists()){
+      errEl.textContent='هذا الحساب غير موجود — هل تملك كود دعوة؟';
+      this.disabled=false; this.textContent='دخول';
+      return;
+    }
+    var userData = snap.val();
+    if(userData.passHash !== hash){
+      errEl.textContent='كلمة المرور غير صحيحة';
+      this.disabled=false; this.textContent='دخول';
+      return;
+    }
+    currentUser = {name:userData.displayName, key:key, role:userData.role||'member'};
+
+    if(remember){
+      localStorage.setItem('postman_user', JSON.stringify(currentUser));
+    } else {
+      sessionStorage.setItem('postman_user', JSON.stringify(currentUser));
+    }
+    enterApp();
+
+  }catch(e){
+    errEl.textContent='خطأ في الاتصال، حاول مجدداً';
+    this.disabled=false; this.textContent='دخول';
+  }
+});
+
+document.getElementById('loginPass').addEventListener('keypress', function(e){
+  if(e.key==='Enter') document.getElementById('loginBtn').click();
+});
+
+/* ══ INVITE-CODE REGISTRATION ══ */
+document.getElementById('registerBtn').addEventListener('click', async function(){
+  var code = document.getElementById('inviteCode').value.trim();
+  var name = document.getElementById('inviteName').value.trim();
+  var pass = document.getElementById('invitePass').value;
+  var errEl = document.getElementById('inviteErr');
+  errEl.textContent='';
+
+  var question = document.getElementById('secretQuestion').value;
+  var answer = document.getElementById('secretAnswer').value.trim();
+  if(!code){ errEl.textContent='أدخل كود الدعوة'; return; }
+  if(!name){ errEl.textContent='أدخل اسمك'; return; }
+  if(!pass || pass.length<4){ errEl.textContent='كلمة المرور يجب أن تكون ٤ أحرف على الأقل'; return; }
+  if(!question){ errEl.textContent='اختر سؤالاً سرياً'; return; }
+  if(!answer || answer.length<2){ errEl.textContent='أدخل إجابة السؤال السري'; return; }
+
+  this.disabled = true;
+  this.textContent = 'جارٍ التحقق...';
+
+  try{
+    var codeSnap = await db.ref('postman_invites/'+code).get();
+    if(!codeSnap.exists()){
+      errEl.textContent='كود الدعوة غير صحيح';
+      this.disabled=false; this.textContent='تسجيل وإنشاء الحساب';
+      return;
+    }
+    var codeData = codeSnap.val();
+    if(codeData.used){
+      errEl.textContent='تم استخدام هذا الكود مسبقاً';
+      this.disabled=false; this.textContent='تسجيل وإنشاء الحساب';
+      return;
+    }
+
+    var key = nameKey(name);
+    var existingUser = await db.ref('postman_users/'+key).get();
+    if(existingUser.exists()){
+      errEl.textContent='هذا الاسم مسجّل بالفعل، جرّب تسجيل الدخول';
+      this.disabled=false; this.textContent='تسجيل وإنشاء الحساب';
+      return;
+    }
+
+    var hash = await hashPass(pass);
+    var qLabels = {'q1':'ما اسم أول مدرسة دخلتها؟','q2':'ما اسم أفضل صديق في طفولتك؟','q3':'ما اسم المدينة التي وُلدت فيها؟','q4':'ما هو لقبك المفضل في الطفولة؟','q5':'ما اسم حيوانك الأليف الأول؟','q6':'ما هو طبقك المفضل؟','q7':'ما هو اسم مدينتك المفضلة؟'};
+    await db.ref('postman_users/'+key).set({
+      displayName:name, passHash:hash, createdAt:firebase.database.ServerValue.TIMESTAMP,
+      secretQuestion:question, secretQuestionLabel:qLabels[question]||'', secretAnswer:answer.toLowerCase()
+    });
+    await db.ref('postman_invites/'+code).update({
+      used:true, usedBy:name, usedAt:firebase.database.ServerValue.TIMESTAMP
+    });
+
+    currentUser = {name:name, key:key};
+    localStorage.setItem('postman_user', JSON.stringify(currentUser));
+    enterApp();
+    toast('✅ تم تسجيلك بنجاح، أهلاً بك');
+
+  }catch(e){
+    errEl.textContent='خطأ في الاتصال، حاول مجدداً';
+    this.disabled=false; this.textContent='تسجيل وإنشاء الحساب';
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', function(){
+  localStorage.removeItem('postman_user');
+  sessionStorage.removeItem('postman_user');
+  currentUser = null;
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginName').value='';
+  document.getElementById('loginPass').value='';
+});
+
+function tryAutoLogin(){
+  var saved = localStorage.getItem('postman_user') || sessionStorage.getItem('postman_user');
+  if(saved){
+    try{
+      currentUser = JSON.parse(saved);
+      db.ref('postman_users/'+currentUser.key+'/role').once('value', function(snap){
+        currentUser.role = snap.exists() ? snap.val() : 'member';
+      });
+      enterApp();
+      return true;
+    }catch(e){}
+  }
+  return false;
+}
+
+function enterApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('userNameDisplay').textContent = currentUser.name;
+  document.getElementById('loginBtn').disabled=false;
+  document.getElementById('loginBtn').textContent='دخول';
+
+  loadPublicFeed();
+  loadInbox();
+  updatePresence();
+  setInterval(updatePresence, 3*60*1000);
+  loadSent();
+  loadEntertain();
+  loadAdSpace();
+  loadFavorites();
+  loadLibraryFB();
+  loadSurprises();
+  loadCustomRadioStations();
+  cleanupSurprises();
+  loadMarquee();
+  loadMusicSetting();
+  loadUserProfile();
+  cleanupOldMessages();
+  setupNotifications();
+}
+
+/* ══ PUSH NOTIFICATIONS ══ */
+var VAPID_KEY = "BMLw8wUDYk8BY22mkhheK0oKJ29-bQJtOJn6ZOJDbQV1a5smk0dAUGn4weaVC8AMlBt6pK8BwuV69RJbCw7-qBE";
+
+async function setupNotifications(){
+  try{
+    if(!('Notification' in window) || !('serviceWorker' in navigator)){ return; }
+    if(!currentUser){ return; }
+    var permission = Notification.permission;
+    if(permission === 'default') permission = await Notification.requestPermission();
+    if(permission !== 'granted'){ return; }
+    
+    var registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    
+    var messaging = firebase.messaging();
+    var token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
+    if(token){
+      await db.ref('postman_tokens/' + currentUser.key + '/' + token).set(true);
+      
+    } else {
+      
+    }
+  }catch(err){
+    
+  }
+}
+
+document.querySelectorAll('.tab').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+    document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.view).classList.add('active');
+  });
+});
+
+document.getElementById('toName').addEventListener('input', function(){
+  var val = this.value.trim();
+  var statusEl = document.getElementById('recipientStatus');
+  clearTimeout(recipientCheckTimeout);
+  if(!val){ statusEl.textContent=''; statusEl.className='recipient-status'; return; }
+  if(val==='الجميع'){ statusEl.textContent='✓ سترسل لجميع الأعضاء'; statusEl.className='recipient-status ok'; return; }
+  statusEl.textContent='جارٍ التحقق...'; statusEl.className='recipient-status';
+
+  recipientCheckTimeout = setTimeout(async function(){
+    var key = nameKey(val);
+    try{
+      var snap = await db.ref('postman_users/'+key).get();
+      if(snap.exists()){
+        statusEl.textContent='✓ هذا الاسم مسجّل';
+        statusEl.className='recipient-status ok';
+      } else {
+        statusEl.textContent='⚠ هذا الاسم غير مسجّل بعد — لن تصله الرسالة في صندوقه حتى يسجّل دخوله';
+        statusEl.className='recipient-status bad';
+      }
+    }catch(e){}
+  }, 500);
+});
+
+var editor = document.getElementById('msgEditor');
+
+function updateCharCount(){
+  var text = editor.innerText || '';
+  document.getElementById('charCount').textContent = text.length;
+}
+editor.addEventListener('input', updateCharCount);
+
+document.getElementById('boldBtn').addEventListener('click', function(){
+  document.execCommand('bold'); editor.focus();
+  this.classList.toggle('tool-active');
+});
+document.getElementById('italicBtn').addEventListener('click', function(){
+  document.execCommand('italic'); editor.focus();
+  this.classList.toggle('tool-active');
+});
+document.getElementById('fontSizeSel').addEventListener('change', function(){
+  document.execCommand('fontSize', false, this.value); editor.focus();
+});
+document.getElementById('fontColorSel').addEventListener('input', function(){
+  document.execCommand('foreColor', false, this.value); editor.focus();
+});
+
+var emojiPop = document.getElementById('emojiPop');
+EMOJI_LIST.forEach(function(em){
+  var span = document.createElement('span');
+  span.textContent = em;
+  span.addEventListener('click', function(){
+    editor.focus();
+    document.execCommand('insertText', false, em);
+    emojiPop.classList.remove('open');
+    updateCharCount();
+  });
+  emojiPop.appendChild(span);
+});
+document.getElementById('emojiBtn').addEventListener('click', function(e){
+  e.stopPropagation();
+  emojiPop.classList.toggle('open');
+});
+document.addEventListener('click', function(e){
+  if(!emojiPop.contains(e.target) && e.target.id!=='emojiBtn'){
+    emojiPop.classList.remove('open');
+  }
+});
+
+document.getElementById('openPickerBtn').addEventListener('click', function(){
+  allMembersCache = allMembersCache.filter(function(m){ return m.key!=='__everyone__'; });
+  allMembersCache.unshift({key:'__everyone__', name:'الجميع'});
+  document.getElementById('pickerModal').classList.add('show');
+  document.getElementById('pickerSearch').value='';
+  window.scrollTo(0,0);
+  renderPickerList();
+});
+document.getElementById('pickerBackBtn').addEventListener('click', function(){
+  document.getElementById('pickerModal').classList.remove('show');
+});
+document.querySelectorAll('.picker-tab').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    document.querySelectorAll('.picker-tab').forEach(function(t){t.classList.remove('active');});
+    tab.classList.add('active');
+    pickerActiveTab = tab.dataset.ptab;
+    renderPickerList();
+  });
+});
+document.getElementById('pickerSearch').addEventListener('input', renderPickerList);
+
+async function loadAllMembersIfNeeded(){
+  if(allMembersCache.length>0) return;
+  var snap = await db.ref('postman_users').get();
+  var arr = [];
+  snap.forEach(function(child){
+    var u = child.val();
+    arr.push({key:child.key, name:u.displayName});
+  });
+  arr.sort(function(a,b){return a.name.localeCompare(b.name,'ar');});
+  allMembersCache = arr;
+}
+
+function loadFavorites(){
+  db.ref('postman_favorites/'+currentUser.key).on('value', function(snap){
+    var arr = [];
+    snap.forEach(function(child){ arr.push({key:child.key, name:child.val().name}); });
+    favoritesCache = arr;
+    // إعادة الرسم الكاملة فقط عند تبويب المفضلة لتفادي تعارضها مع التحديث الفوري في تبويب كل الأعضاء
+    if(pickerActiveTab==='favorites' && document.getElementById('pickerModal').classList.contains('show')){
+      renderPickerList();
+    }
+  });
+}
+
+async function renderPickerList(){
+  var list = document.getElementById('pickerList');
+  var q = document.getElementById('pickerSearch').value.trim().toLowerCase();
+  list.innerHTML = '<div class="picker-empty">جارٍ التحميل...</div>';
+
+  var items;
+  if(pickerActiveTab==='favorites'){
+    items = favoritesCache.slice();
+  } else {
+    await loadAllMembersIfNeeded();
+    items = allMembersCache.slice();
+  }
+
+  if(q){
+    items = items.filter(function(it){ return it.name.toLowerCase().indexOf(q)!==-1; });
+  }
+
+  list.innerHTML='';
+  if(items.length===0){
+    list.innerHTML = '<div class="picker-empty">'+(pickerActiveTab==='favorites'?'لا توجد أسماء في المفضلة بعد':'لا توجد نتائج')+'</div>';
+    return;
+  }
+
+  items.forEach(function(it){
+    var isFav = favoritesCache.some(function(f){return f.key===it.key;});
+    var row = document.createElement('div');
+    row.className='picker-item';
+    row.innerHTML = '<span>'+escapeHtml(it.name)+'</span><span class="fav-star'+(isFav?' active':'')+'" data-key="'+it.key+'" data-name="'+escapeHtml(it.name)+'">'+(isFav?'★':'☆')+'</span>';
+    row.querySelector('span:first-child').addEventListener('click', function(){
+      if(surprisePickerMode){
+        document.getElementById('surpriseToInput').value = it.name;
+        document.getElementById('surpriseToInput').dispatchEvent(new Event('input'));
+        surpriseSelectedKey = it.key;
+        surpriseSelectedName = it.name;
+      } else {
+        document.getElementById('toName').value = it.name;
+        document.getElementById('toName').dispatchEvent(new Event('input'));
+      }
+      document.getElementById('pickerModal').classList.remove('show');
+      surprisePickerMode = false;
+    });
+    row.querySelector('.fav-star').addEventListener('click', async function(e){
+      e.stopPropagation();
+      var k = this.dataset.key, n = this.dataset.name;
+      var starEl = this;
+      var nowActive = !starEl.classList.contains('active');
+
+      // تحديث فوري للشكل البصري بغض النظر عن التاب النشط
+      starEl.classList.toggle('active', nowActive);
+      starEl.textContent = nowActive ? '★' : '☆';
+
+      try{
+        if(nowActive){
+          await db.ref('postman_favorites/'+currentUser.key+'/'+k).set({name:n});
+        } else {
+          await db.ref('postman_favorites/'+currentUser.key+'/'+k).remove();
+        }
+      }catch(err){
+        // تراجع عن التحديث المحلي إذا فشلت العملية
+        starEl.classList.toggle('active', !nowActive);
+        starEl.textContent = !nowActive ? '★' : '☆';
+        toast('⚠ حدث خطأ، حاول مجدداً');
+      }
+    });
+    list.appendChild(row);
+  });
+}
+
+document.getElementById('previewBtn').addEventListener('click', function(){
+  var toName = document.getElementById('toName').value.trim();
+  var contentHtml = editor.innerHTML.trim();
+  var contentText = editor.innerText.trim();
+  var imgUrl = document.getElementById('imgUrl').value.trim();
+  var audioUrl = document.getElementById('audioUrl').value.trim();
+  var videoUrl = document.getElementById('videoUrl').value.trim();
+  var showName = document.getElementById('showNameToggle').checked;
+
+  if(!toName && !contentText && !imgUrl && !audioUrl && !videoUrl){
+    toast('⚠ لا يوجد شيء لمعاينته بعد');
+    return;
+  }
+
+  var previewMsg = {
+    toName: toName || '(لم يُحدَّد بعد)',
+    fromName: currentUser.name,
+    showSender: showName,
+    content: contentText,
+    contentHtml: contentHtml,
+    imgUrl: imgUrl || null,
+    audioUrl: audioUrl || null,
+    videoUrl: videoUrl || null,
+    createdAt: Date.now()
+  };
+
+  openDetail(previewMsg, {showStatus:false, allowDelete:false, isPreview:true});
+});
+
+document.getElementById('sendBtn').addEventListener('click', async function(){
+  var toName = document.getElementById('toName').value.trim();
+  var contentHtml = editor.innerHTML.trim();
+  var contentText = editor.innerText.trim();
+  var imgUrl = document.getElementById('imgUrl').value.trim();
+  var audioUrl = document.getElementById('audioUrl').value.trim();
+  var videoUrl = document.getElementById('videoUrl').value.trim();
+  var showName = document.getElementById('showNameToggle').checked;
+  var showPublic = document.getElementById('showPublicToggle').checked;
+
+  if(!toName){ toast('⚠ أدخل اسم المستلم'); return; }
+  if(!contentText && !imgUrl && !audioUrl && !videoUrl){ toast('⚠ اكتب رسالة أو أضف مرفقاً على الأقل'); return; }
+  if(contentText.length>500){ toast('⚠ الرسالة طويلة جداً'); return; }
+
+  this.disabled=true;
+  this.textContent='جارٍ التحقق...';
+
+  // ══ حد أقصى ١٠ رسائل يومياً ══
+  try{
+    var dayAgo = Date.now() - 24*60*60*1000;
+    var sentSnap = await db.ref('postman_messages').orderByChild('fromKey').equalTo(currentUser.key).get();
+    var todayCount = 0;
+    if(sentSnap.exists()){
+      Object.values(sentSnap.val()).forEach(function(m){
+        if((m.createdAt||0) >= dayAgo) todayCount++;
+      });
+    }
+    if(todayCount >= 50){
+      toast('⚠ وصلت للحد الأقصى (١٠ رسائل في اليوم)، حاول لاحقاً');
+      this.disabled=false;
+      this.textContent='إرسال الرسالة ✉';
+      return;
+    }
+  }catch(e){ /* في حال فشل التحقق، نكمل عادي بدون حظر */ }
+
+  this.textContent='جارٍ الإرسال...';
+
+  try{
+    var msgData = {
+      toKey: nameKey(toName),
+      toName: toName,
+      fromKey: currentUser.key,
+      fromName: currentUser.name,
+      showSender: showName,
+      showPublic: showPublic,
+      content: contentText,
+      contentHtml: contentHtml || null,
+      imgUrl: imgUrl || null,
+      audioUrl: audioUrl || null,
+      videoUrl: videoUrl || null,
+      status: 'pending',
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    };
+    await db.ref('postman_messages').push(msgData);
+
+    toast('✅ تم إرسال رسالتك، بانتظار اعتماد المشرفين');
+
+    document.getElementById('toName').value='';
+    editor.innerHTML='';
+    document.getElementById('imgUrl').value='';
+    document.getElementById('audioUrl').value='';
+    document.getElementById('videoUrl').value='';
+    document.getElementById('charCount').textContent='0';
+    document.getElementById('recipientStatus').textContent='';
+    document.getElementById('showNameToggle').checked=false;
+    document.getElementById('showPublicToggle').checked=true;
+
+  }catch(e){
+    toast('⚠ حدث خطأ، حاول مجدداً');
+  }
+  this.disabled=false;
+  this.textContent='إرسال الرسالة ✉';
+});
+
+function formatDate(ts){
+  if(!ts) return '';
+  var d = new Date(ts);
+  var now = new Date();
+  var diffMs = now - d;
+  var diffMin = Math.floor(diffMs/60000);
+  var diffHr = Math.floor(diffMin/60);
+  var diffDay = Math.floor(diffHr/24);
+  if(diffMin<1) return 'الآن';
+  if(diffMin<60) return 'منذ '+diffMin+' دقيقة';
+  if(diffHr<24) return 'منذ '+diffHr+' ساعة';
+  if(diffDay<7) return 'منذ '+diffDay+' يوم';
+  return d.toLocaleDateString('ar-EG');
+}
+
+function escapeHtml(s){
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+function formatName(name){
+  if(!name) return '';
+  var escaped = escapeHtml(name);
+  if(name === 'حنين') return '<span class="haneen-name">'+escaped+'</span>';
+  return escaped;
+}
+
+/* ══ SMART MEDIA URL DETECTION ══ */
+function parseVideoUrl(url){
+  if(!url) return null;
+  // YouTube: youtube.com/watch?v=ID , youtu.be/ID , youtube.com/shorts/ID
+  var yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+  if(yt) return {type:'youtube', embedUrl:'https://www.youtube.com/embed/'+yt[1]};
+
+  // Vimeo: vimeo.com/ID
+  var vm = url.match(/vimeo\.com\/(\d+)/);
+  if(vm) return {type:'vimeo', embedUrl:'https://player.vimeo.com/video/'+vm[1]};
+
+  // مباشر: أي رابط آخر يُفترض أنه ملف فيديو مباشر (mp4, webm...)
+  return {type:'direct', embedUrl:url};
+}
+
+function parseAudioUrl(url){
+  if(!url) return null;
+  // SoundCloud لا يقدّم رابط ملف مباشر، يحتاج embed خاص بمشغّله
+  if(/soundcloud\.com\//.test(url)){
+    return {type:'soundcloud', embedUrl:'https://w.soundcloud.com/player/?url='+encodeURIComponent(url)+'&color=%23d4a852&auto_play=false&show_user=true'};
+  }
+  // مباشر: ملف صوتي (mp3, ogg, wav...) أو رابط من مضيف يدعم تشغيل HTML5 audio مباشرة
+  return {type:'direct', embedUrl:url};
+}
+
+function renderVideoEmbed(url){
+  var parsed = parseVideoUrl(url);
+  if(!parsed) return '';
+  if(parsed.type==='direct'){
+    return '<video class="detail-video" controls src="'+parsed.embedUrl+'"></video>';
+  }
+  return '<div class="embed-wrap"><iframe class="embed-iframe" src="'+parsed.embedUrl+'" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen frameborder="0"></iframe></div>';
+}
+
+function renderAudioEmbed(url){
+  var parsed = parseAudioUrl(url);
+  if(!parsed) return '';
+  if(parsed.type==='direct'){
+    return '<audio class="detail-audio" controls src="'+parsed.embedUrl+'"></audio>';
+  }
+  return '<iframe class="embed-iframe-audio" src="'+parsed.embedUrl+'" allow="autoplay" frameborder="0"></iframe>';
+}
+
+function renderTile(msg, opts){
+  opts = opts || {};
+  var fromLabel = msg.showSender ? msg.fromName : 'مجهول';
+  var div = document.createElement('div');
+  div.className = 'tile' + (opts.isInbox && !msg.read ? ' tile-unread' : '');
+
+  var statusHtml = '';
+  if(opts.showStatus){
+    if(msg.status==='pending') statusHtml='<div class="tile-status pending">⏳ بانتظار</div>';
+    else if(msg.status==='rejected') statusHtml='<div class="tile-status rejected">✕ مرفوضة</div>';
+  }
+
+  var readBadge = '';
+  if(opts.isInbox && !msg.read) readBadge = '<span class="unread-dot" title="غير مقروءة"></span>';
+  if(opts.sentView && msg.status==='approved'){
+    readBadge = msg.read
+      ? '<span class="read-tag read-yes">✓ قُرئت</span>'
+      : '<span class="read-tag read-no">○ لم تُقرأ</span>';
+  }
+
+  var previewText = msg.content ? escapeHtml(msg.content) : '';
+  var imgFlag = msg.imgUrl ? '<div class="tile-img-flag">🖼 صورة</div>' : '';
+  var audioFlag = msg.audioUrl ? '<div class="tile-img-flag">🎵 صوت</div>' : '';
+  var videoFlag = msg.videoUrl ? '<div class="tile-img-flag">🎬 فيديو</div>' : '';
+  var delHtml = opts.allowDelete ? '<span class="tile-del" data-id="'+opts.id+'">🗑</span>' : '';
+
+  // التقييمات للرسائل العامة
+  var reactionsHtml = '';
+  var repliesHtml = '';
+  var adminDelHtml = '';
+
+  if(opts.isPublic && opts.id){
+    var r = msg.reactions || {};
+    var ukey = currentUser ? currentUser.key : '';
+    var heart = Object.keys(r.heart||{}).length;
+    var flower = Object.keys(r.flower||{}).length;
+    var like = Object.keys(r.like||{}).length;
+    reactionsHtml = '<div class="reactions-bar">'+
+      '<button onclick="addReaction(\''+opts.id+'\',\'heart\',this)" style="background:'+(r.heart&&r.heart[ukey]?'rgba(240,100,100,.25)':'rgba(255,255,255,.05)')+';border:1px solid rgba(240,100,100,.3);border-radius:20px;padding:3px 10px;cursor:pointer;color:#fae080;font-size:.8rem">❤️ '+(heart||'')+'</button>'+
+      '<button onclick="addReaction(\''+opts.id+'\',\'flower\',this)" style="background:'+(r.flower&&r.flower[ukey]?'rgba(200,100,200,.25)':'rgba(255,255,255,.05)')+';border:1px solid rgba(200,100,200,.3);border-radius:20px;padding:3px 10px;cursor:pointer;color:#fae080;font-size:.8rem">⚘️ '+(flower||'')+'</button>'+
+      '<button onclick="addReaction(\''+opts.id+'\',\'like\',this)" style="background:'+(r.like&&r.like[ukey]?'rgba(100,180,240,.25)':'rgba(255,255,255,.05)')+';border:1px solid rgba(100,180,240,.3);border-radius:20px;padding:3px 10px;cursor:pointer;color:#fae080;font-size:.8rem">👍 '+(like||'')+'</button>'+
+    '</div>';
+
+    repliesHtml = '<div class="replies-section" id="replies-section-'+opts.id+'">'+
+      '<button class="replies-toggle" onclick="toggleReplies(\''+opts.id+'\',this)">💬 الردود</button>'+
+      '<div class="replies-list" id="replies-list-'+opts.id+'">'+
+        '<div class="reply-input-wrap">'+
+          '<input class="reply-input" id="reply-input-'+opts.id+'" placeholder="اكتب ردك...">'+
+          '<button class="reply-send-btn" onclick="sendReply(\''+opts.id+'\')">إرسال</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+
+    if(currentUser && currentUser.role==='admin'){
+      adminDelHtml = '<button onclick="adminDeleteMsg(\''+opts.id+'\')" style="background:rgba(229,115,115,.1);border:1px solid rgba(229,115,115,.3);border-radius:8px;padding:3px 10px;color:#f08080;font-size:.72rem;cursor:pointer;margin-top:6px">🗑 حذف الرسالة</button>';
+    }
+  }
+
+  div.innerHTML =
+    statusHtml + readBadge +
+    '<div class="tile-to"><span>إلى</span>'+formatName(msg.toName)+'</div>'+
+    '<div class="tile-date">'+formatDate(msg.createdAt)+'</div>'+
+    '<div class="tile-preview">'+(msg.contentHtml||previewText)+'</div>'+
+    imgFlag + audioFlag + videoFlag + delHtml + reactionsHtml + adminDelHtml + repliesHtml;
+
+  div.addEventListener('click', function(e){
+    if(e.target.classList.contains('tile-del')) return;
+    if(e.target.closest('.reactions-bar')) return;
+    if(e.target.closest('.replies-section')) return;
+    if(e.target.closest('[onclick*="adminDeleteMsg"]')) return;
+    if(opts.isInbox && !msg.read && opts.id){
+      db.ref('postman_messages/'+opts.id+'/read').set(true);
+    }
+    openDetail(msg, opts);
+  });
+
+  if(opts.allowDelete){
+    div.querySelector('.tile-del').addEventListener('click', async function(e){
+      e.stopPropagation();
+      if(!confirm('حذف هذه الرسالة؟')) return;
+      await db.ref('postman_messages/'+opts.id).remove();
+      toast('🗑 تم حذف الرسالة');
+    });
+  }
+
+  return div;
+}
+
+function openDetail(msg, opts){
+  var fromLabel = msg.showSender ? msg.fromName : 'مجهول';
+  document.getElementById('detailTo').textContent = msg.toName;
+  document.getElementById('detailDate').textContent = (opts && opts.isPreview) ? 'معاينة' : formatDate(msg.createdAt);
+  document.getElementById('detailContent').innerHTML = msg.contentHtml || escapeHtml(msg.content||'');
+  document.getElementById('detailFrom').textContent = '~ من '+fromLabel+' ~';
+
+  var previewBanner = document.getElementById('detailPreviewBanner');
+  if(opts && opts.isPreview) previewBanner.classList.remove('hidden');
+  else previewBanner.classList.add('hidden');
+
+  var img = document.getElementById('detailImg');
+  if(msg.imgUrl){ img.src = msg.imgUrl; img.classList.remove('hidden'); }
+  else { img.classList.add('hidden'); img.src=''; }
+
+  var audioWrap = document.getElementById('detailAudioWrap');
+  audioWrap.innerHTML = msg.audioUrl ? renderAudioEmbed(msg.audioUrl) : '';
+
+  var videoWrap = document.getElementById('detailVideoWrap');
+  videoWrap.innerHTML = msg.videoUrl ? renderVideoEmbed(msg.videoUrl) : '';
+
+  var statusBadge = document.getElementById('detailStatusBadge');
+  var rejectBox = document.getElementById('detailRejectReason');
+  statusBadge.innerHTML=''; rejectBox.classList.add('hidden');
+  if(opts && opts.showStatus){
+    if(msg.status==='pending') statusBadge.innerHTML='<div class="tile-status pending" style="position:static">⏳ بانتظار الاعتماد</div>';
+    if(msg.status==='rejected'){
+      statusBadge.innerHTML='<div class="tile-status rejected" style="position:static">✕ مرفوضة</div>';
+      if(msg.rejectReason){
+        rejectBox.textContent = '💬 سبب الرفض: '+msg.rejectReason;
+        rejectBox.classList.remove('hidden');
+      }
+    }
+  }
+
+  var delWrap = document.getElementById('detailDeleteWrap');
+  delWrap.innerHTML='';
+  if(opts && opts.allowDelete){
+    var btn = document.createElement('button');
+    btn.className='mini-btn danger'; btn.style.width='100%';
+    btn.textContent='🗑 حذف هذه الرسالة';
+    btn.addEventListener('click', async function(){
+      if(!confirm('حذف هذه الرسالة؟')) return;
+      await db.ref('postman_messages/'+opts.id).remove();
+      document.getElementById('detailModal').classList.remove('show');
+      toast('🗑 تم حذف الرسالة');
+    });
+    delWrap.appendChild(btn);
+  }
+
+  document.getElementById('detailModal').classList.add('show');
+}
+document.getElementById('closeDetailBtn').addEventListener('click', function(){
+  document.getElementById('detailModal').classList.remove('show');
+});
+document.getElementById('detailModal').addEventListener('click', function(e){
+  if(e.target.id==='detailModal') this.classList.remove('show');
+});
+
+var publicCache = [];
+var publicFilter = 'all';
+
+/* ══ MEMBERS ══ */
+var selectedMember = null;
+
+function updatePresence(){
+  if(!currentUser) return;
+  db.ref('postman_users/'+currentUser.key+'/lastSeen').set(firebase.database.ServerValue.TIMESTAMP);
+}
+
+window.toggleMembersList = function(){
+  var dropdown = document.getElementById('membersDropdown');
+  var btn = document.getElementById('membersToggleBtn');
+  if(dropdown.style.display==='none'){
+    dropdown.style.display='block';
+    btn.textContent='👥 إخفاء الأعضاء';
+    loadMembers();
+  } else {
+    dropdown.style.display='none';
+    btn.textContent='👥 عرض الأعضاء';
+  }
+};
+
+function loadMembers(){
+  var now = Date.now();
+  var onlineThreshold = 5*60*1000;
+  var recentThreshold = 24*60*60*1000;
+  db.ref('postman_users').on('value', function(snap){
+    var online=[], recent=[], all=[];
+    snap.forEach(function(child){
+      var u = child.val();
+      if(!u.displayName) return;
+      var m = {key:child.key, name:u.displayName, avatar:u.avatarUrl||'', lastSeen:u.lastSeen||0};
+      all.push(m);
+      var age = now - m.lastSeen;
+      if(age < onlineThreshold) online.push(m);
+      else if(age < recentThreshold) recent.push(m);
+    });
+    all.sort(function(a,b){ return b.lastSeen-a.lastSeen; });
+    recent.sort(function(a,b){ return b.lastSeen-a.lastSeen; });
+    document.getElementById('onlineCount').textContent = online.length;
+    document.getElementById('recentCount').textContent = recent.length;
+    document.getElementById('allCount').textContent = all.length;
+    renderMemberList('onlineList', online, true);
+    renderMemberList('recentList', recent, false);
+    renderMemberList('allList', all, false);
+  });
+}
+
+function renderMemberList(containerId, members, showDot){
+  var container = document.getElementById(containerId);
+  if(!container) return;
+  container.innerHTML='';
+  if(members.length===0){
+    container.innerHTML='<div style="font-size:.78rem;color:rgba(253,244,216,.3);padding:8px">لا يوجد أعضاء</div>';
+    return;
+  }
+  members.forEach(function(m){
+    var card = document.createElement('div');
+    card.className='member-card';
+    var avatarHtml = m.avatar
+      ? '<img class="member-avatar" src="'+escapeHtml(m.avatar)+'" onerror="this.style.display=\'none\'">'
+      : '<div class="member-avatar-placeholder">👤</div>';
+    var dotHtml = showDot ? '<div class="member-status-dot"></div>' : '';
+    card.innerHTML = avatarHtml+'<div class="member-name">'+escapeHtml(m.name)+'</div>'+dotHtml;
+    container.appendChild(card);
+  });
+}
+
+
+function addReaction(msgId, type, btn){
+  if(!currentUser) return;
+  var path = 'postman_messages/'+msgId+'/reactions/'+type+'/'+currentUser.key;
+  db.ref(path).once('value', function(snap){
+    if(snap.exists()){ db.ref(path).remove(); }
+    else { db.ref(path).set(true); }
+  });
+}
+
+function toggleReplies(msgId, btn){
+  var list = document.getElementById('replies-list-'+msgId);
+  if(!list) return;
+  var isOpen = list.classList.contains('open');
+  if(isOpen){ list.classList.remove('open'); btn.textContent='💬 الردود'; }
+  else { list.classList.add('open'); loadReplies(msgId); btn.textContent='💬 أخفِ الردود'; }
+}
+
+function loadReplies(msgId){
+  var list = document.getElementById('replies-list-'+msgId);
+  if(!list) return;
+  db.ref('postman_replies/'+msgId).orderByChild('createdAt').on('value', function(snap){
+    list.innerHTML='';
+    if(snap.exists()){
+      snap.forEach(function(child){
+        var r = child.val(); var rid = child.key;
+        var isAdm = currentUser && currentUser.role==='admin';
+        var item = document.createElement('div');
+        item.className='reply-item';
+        var textDiv = document.createElement('div');
+        textDiv.className='reply-text';
+        textDiv.innerHTML='<div class="reply-author">'+formatName(r.fromName||'مجهول')+'</div>'+escapeHtml(r.text||'');
+        var delBtn = document.createElement('button');
+        delBtn.className='reply-del-btn'+(isAdm?' visible':'');
+        delBtn.textContent='🗑';
+        (function(mid,rid2){ delBtn.addEventListener('click',function(e){ e.stopPropagation(); deleteReply(mid,rid2); }); })(msgId,rid);
+        item.appendChild(textDiv); item.appendChild(delBtn);
+        list.appendChild(item);
+      });
+    }
+    var inputWrap = document.createElement('div');
+    inputWrap.className='reply-input-wrap';
+    var inp = document.createElement('input');
+    inp.className='reply-input'; inp.id='reply-input-'+msgId; inp.placeholder='اكتب ردك...';
+    inp.addEventListener('click',function(e){ e.stopPropagation(); });
+    inp.addEventListener('focus',function(e){ e.stopPropagation(); });
+    var sendBtn = document.createElement('button');
+    sendBtn.className='reply-send-btn'; sendBtn.textContent='إرسال';
+    (function(mid){ sendBtn.addEventListener('click',function(e){ e.stopPropagation(); sendReply(mid); }); })(msgId);
+    inputWrap.appendChild(inp); inputWrap.appendChild(sendBtn);
+    list.appendChild(inputWrap);
+  });
+}
+
+function sendReply(msgId){
+  if(!currentUser){ toast('يجب تسجيل الدخول أولاً'); return; }
+  var inp = document.getElementById('reply-input-'+msgId);
+  if(!inp) return;
+  var text = inp.value.trim();
+  if(!text) return;
+  inp.value='';
+  db.ref('postman_replies/'+msgId).push({
+    fromKey:currentUser.key, fromName:currentUser.name, text:text,
+    createdAt:firebase.database.ServerValue.TIMESTAMP
+  }).then(function(){ toast('✅ تم إرسال ردك'); });
+}
+
+function deleteReply(msgId, rid){
+  if(!currentUser || currentUser.role!=='admin') return;
+  if(!confirm('حذف هذا الرد؟')) return;
+  db.ref('postman_replies/'+msgId+'/'+rid).remove().then(function(){ toast('🗑 تم حذف الرد'); });
+}
+
+function adminDeleteMsg(msgId){
+  if(!currentUser || currentUser.role!=='admin') return;
+  if(!confirm('حذف هذه الرسالة؟')) return;
+  db.ref('postman_messages/'+msgId).remove().then(function(){ toast('🗑 تم حذف الرسالة'); });
+}
+
+function loadPublicFeed(){
+  db.ref('postman_messages').orderByChild('status').equalTo('approved').on('value', function(snap){
+    var items = [];
+    snap.forEach(function(child){
+      var m = child.val(); m._id = child.key;
+      if(m.showPublic) items.push(m);
+    });
+    items.sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});
+    publicCache = items;
+    renderPublicFiltered();
+  });
+}
+
+function renderPublicFiltered(){
+  var feed = document.getElementById('publicFeed');
+  var items = publicCache;
+  if(publicFilter==='img') items = items.filter(function(m){return !!m.imgUrl;});
+  else if(publicFilter==='audio') items = items.filter(function(m){return !!m.audioUrl;});
+  else if(publicFilter==='video') items = items.filter(function(m){return !!m.videoUrl;});
+
+  feed.innerHTML='';
+  if(items.length===0){
+    feed.innerHTML = publicCache.length===0
+      ? '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">لا توجد رسائل عامة بعد<br>كن أول من يرسل رسالة</div></div>'
+      : '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">لا توجد رسائل من هذا النوع بعد</div></div>';
+    return;
+  }
+  items.forEach(function(m){
+    feed.appendChild(renderTile(m, {showStatus:false, allowDelete:false, isPublic:true, id:m._id}));
+  });
+}
+
+document.querySelectorAll('.filter-chips .chip').forEach(function(chip){
+  chip.addEventListener('click', function(){
+    document.querySelectorAll('.filter-chips .chip').forEach(function(c){c.classList.remove('active');});
+    chip.classList.add('active');
+    publicFilter = chip.dataset.filter;
+    renderPublicFiltered();
+  });
+});
+
+var inboxCache = [];
+function loadInbox(){
+  db.ref('postman_messages').orderByChild('toKey').equalTo(currentUser.key).on('value', function(snap){
+    var items = [];
+    snap.forEach(function(child){
+      var m = child.val(); m._id = child.key;
+      if(m.status==='approved') items.push(m);
+    });
+    items.sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});
+    inboxCache = items;
+
+    var unreadCount = items.filter(function(m){ return !m.read; }).length;
+    var badge = document.getElementById('inboxBadge');
+    if(unreadCount>0){
+      badge.textContent = unreadCount;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+
+    renderInboxFiltered();
+  });
+}
+
+var inboxSelected = {};
+function updateInboxSelUI(){
+  var count = Object.keys(inboxSelected).length;
+  document.getElementById('inboxSelCount').textContent = count + ' محدد';
+  document.getElementById('inboxDelBtn').disabled = count === 0;
+  document.getElementById('inboxSelectAll').checked = count > 0 && count === document.querySelectorAll('#inboxFeed .tile-check-inp').length;
+}
+function renderInboxFiltered(){
+  var feed = document.getElementById('inboxFeed');
+  var q = document.getElementById('inboxSearch').value.trim().toLowerCase();
+  var items = inboxCache;
+  if(q){ items = items.filter(function(m){ var inContent=(m.content||'').toLowerCase().indexOf(q)!==-1; var inFrom=m.showSender&&(m.fromName||'').toLowerCase().indexOf(q)!==-1; return inContent||inFrom; }); }
+  feed.innerHTML='';
+  if(items.length===0){
+    feed.innerHTML = inboxCache.length===0
+      ? '<div class="empty-state"><div class="empty-icon">📪</div><div class="empty-text">صندوقك فارغ الآن<br>الرسائل الموجّهة إليك ستظهر هنا بعد اعتمادها</div></div>'
+      : '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">لا توجد نتائج مطابقة</div></div>';
+    return;
+  }
+  items.forEach(function(m){
+    var tile = renderTile(m, {showStatus:false, allowDelete:true, id:m._id, isInbox:true});
+    tile.classList.add('selectable');
+    var wrap = document.createElement('div');
+    wrap.className = 'tile-check-wrap';
+    var chk = document.createElement('input');
+    chk.type = 'checkbox'; chk.className = 'tile-check-inp';
+    if(inboxSelected[m._id]) { chk.checked=true; tile.classList.add('tile-checked'); }
+    chk.addEventListener('change', function(e){
+      e.stopPropagation();
+      if(chk.checked){ inboxSelected[m._id]=true; tile.classList.add('tile-checked'); }
+      else{ delete inboxSelected[m._id]; tile.classList.remove('tile-checked'); }
+      updateInboxSelUI();
+    });
+    wrap.appendChild(chk); tile.appendChild(wrap);
+    feed.appendChild(tile);
+  });
+  updateInboxSelUI();
+}
+document.getElementById('inboxSearch').addEventListener('input', function(){ inboxSelected={}; renderInboxFiltered(); });
+document.getElementById('inboxSelectAll').addEventListener('change', function(){
+  var chks = document.querySelectorAll('#inboxFeed .tile-check-inp');
+  inboxSelected = {};
+  chks.forEach(function(chk){ chk.checked = document.getElementById('inboxSelectAll').checked; if(chk.checked){ var id=chk.closest('.tile').querySelector('[data-id]') && chk.closest('.tile').querySelector('.tile-del') ? chk.closest('.tile').querySelector('.tile-del').dataset.id : null; if(!id){ var allItems = inboxCache; allItems.forEach(function(m){ inboxSelected[m._id]=true; }); } } });
+  if(document.getElementById('inboxSelectAll').checked){ inboxCache.forEach(function(m){ inboxSelected[m._id]=true; }); } 
+  document.querySelectorAll('#inboxFeed .tile').forEach(function(t){ t.classList.toggle('tile-checked', document.getElementById('inboxSelectAll').checked); });
+  updateInboxSelUI();
+});
+document.getElementById('inboxDelBtn').addEventListener('click', async function(){
+  var ids = Object.keys(inboxSelected);
+  if(ids.length===0) return;
+  if(!confirm('حذف '+ids.length+' رسالة محددة؟')) return;
+  try{
+    var updates={};
+    ids.forEach(function(id){ updates[id]=null; });
+    await db.ref('postman_messages').update(updates);
+    inboxSelected={};
+    toast('🗑 تم حذف '+ids.length+' رسالة');
+  }catch(e){ toast('⚠ خطأ في الحذف'); }
+});
+
+var sentCache = [];
+function loadSent(){
+  db.ref('postman_messages').orderByChild('fromKey').equalTo(currentUser.key).on('value', function(snap){
+    var items = [];
+    snap.forEach(function(child){
+      var m = child.val(); m._id = child.key; items.push(m);
+    });
+    items.sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});
+    sentCache = items;
+    renderSentFiltered();
+  });
+}
+
+var sentSelected = {};
+function updateSentSelUI(){
+  var count = Object.keys(sentSelected).length;
+  document.getElementById('sentSelCount').textContent = count + ' محدد';
+  document.getElementById('sentDelBtn').disabled = count === 0;
+  document.getElementById('sentSelectAll').checked = count > 0 && count === document.querySelectorAll('#sentFeed .tile-check-inp').length;
+}
+function renderSentFiltered(){
+  var feed = document.getElementById('sentFeed');
+  var q = document.getElementById('sentSearch').value.trim().toLowerCase();
+  var items = sentCache;
+  if(q){ items = items.filter(function(m){ var inContent=(m.content||'').toLowerCase().indexOf(q)!==-1; var inTo=(m.toName||'').toLowerCase().indexOf(q)!==-1; return inContent||inTo; }); }
+  feed.innerHTML='';
+  if(items.length===0){
+    feed.innerHTML = sentCache.length===0
+      ? '<div class="empty-state"><div class="empty-icon">📤</div><div class="empty-text">لم ترسل أي رسالة بعد</div></div>'
+      : '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">لا توجد نتائج مطابقة</div></div>';
+    return;
+  }
+  items.forEach(function(m){
+    var tile = renderTile(m, {showStatus:true, allowDelete:true, id:m._id, sentView:true});
+    tile.classList.add('selectable');
+    var wrap = document.createElement('div');
+    wrap.className = 'tile-check-wrap';
+    var chk = document.createElement('input');
+    chk.type = 'checkbox'; chk.className = 'tile-check-inp';
+    if(sentSelected[m._id]){ chk.checked=true; tile.classList.add('tile-checked'); }
+    chk.addEventListener('change', function(e){
+      e.stopPropagation();
+      if(chk.checked){ sentSelected[m._id]=true; tile.classList.add('tile-checked'); }
+      else{ delete sentSelected[m._id]; tile.classList.remove('tile-checked'); }
+      updateSentSelUI();
+    });
+    wrap.appendChild(chk); tile.appendChild(wrap);
+    feed.appendChild(tile);
+  });
+  updateSentSelUI();
+}
+document.getElementById('sentSearch').addEventListener('input', function(){ sentSelected={}; renderSentFiltered(); });
+document.getElementById('sentSelectAll').addEventListener('change', function(){
+  sentSelected={};
+  if(document.getElementById('sentSelectAll').checked){ sentCache.forEach(function(m){ sentSelected[m._id]=true; }); }
+  document.querySelectorAll('#sentFeed .tile').forEach(function(t){ t.classList.toggle('tile-checked', document.getElementById('sentSelectAll').checked); });
+  document.querySelectorAll('#sentFeed .tile-check-inp').forEach(function(chk){ chk.checked=document.getElementById('sentSelectAll').checked; });
+  updateSentSelUI();
+});
+document.getElementById('sentDelBtn').addEventListener('click', async function(){
+  var ids = Object.keys(sentSelected);
+  if(ids.length===0) return;
+  if(!confirm('حذف '+ids.length+' رسالة محددة؟')) return;
+  try{
+    var updates={};
+    ids.forEach(function(id){ updates[id]=null; });
+    await db.ref('postman_messages').update(updates);
+    sentSelected={};
+    toast('🗑 تم حذف '+ids.length+' رسالة');
+  }catch(e){ toast('⚠ خطأ في الحذف'); }
+});
+
+async function cleanupOldMessages(){
+  try{
+    var cutoff = Date.now() - THIRTY_DAYS_MS;
+    var snap = await db.ref('postman_messages').orderByChild('createdAt').endAt(cutoff).get();
+    var updates = {};
+    var count=0;
+    snap.forEach(function(child){
+      var m = child.val();
+      if(m.status==='approved' || m.status==='rejected'){
+        updates[child.key]=null; count++;
+      }
+    });
+    if(count>0) await db.ref('postman_messages').update(updates);
+  }catch(e){ }
+}
+
+/* ══ MARQUEE (شريط الإهداءات) ══ */
+var _mqRAF = null, _mqPos = 0, _mqUnitW = 0;
+function loadMarquee(){
+  db.ref('postman_settings/marquee').on('value', function(snap){
+    var bar = document.getElementById('marqueeBar');
+    var track = document.getElementById('marqueeTrack');
+    var text = snap.exists() ? snap.val() : '';
+    if(_mqRAF){ cancelAnimationFrame(_mqRAF); _mqRAF=null; }
+    if(text && text.trim()){
+      var visible = escapeHtml(text);
+      var hidden = '<span style="color:transparent;user-select:none">' + visible + '</span>';
+      // عبارة ظاهرة + عبارة مخفية كفاصل، 20 تكرار
+      var unit = visible + hidden;
+      track.innerHTML = '<span class="marquee-inner" id="_mqEl">' + unit.repeat(20) + '</span>';
+      bar.classList.add('has-content');
+      _mqPos = 0;
+      setTimeout(function(){
+        var el = document.getElementById('_mqEl');
+        if(!el) return;
+        _mqUnitW = el.scrollWidth / 20;
+        function tick(){
+          _mqPos -= 0.35; // سرعة أبطأ
+          if(_mqUnitW > 0 && Math.abs(_mqPos) >= _mqUnitW) _mqPos += _mqUnitW;
+          el.style.transform = 'translateX(' + _mqPos + 'px)';
+          _mqRAF = requestAnimationFrame(tick);
+        }
+        tick();
+      }, 100);
+    } else {
+      track.innerHTML='';
+      bar.classList.remove('has-content');
+    }
+  });
+}
+
+/* ══ MUSIC (الموسيقى) ══ */
+var musicPlaying = false;
+function loadMusicSetting(){
+  db.ref('postman_settings/musicUrl').on('value', function(snap){
+    var url = snap.exists() ? snap.val() : '';
+    var audio = document.getElementById('bgMusic');
+    var btn = document.getElementById('musicToggleBtn');
+    if(url && url.trim()){
+      audio.src = url;
+      btn.style.display='flex';
+      var savedPref = localStorage.getItem('postman_music');
+      if(savedPref==='on'){ playMusic(); }
+    } else {
+      audio.pause();
+      btn.style.display='none';
+    }
+  });
+}
+function playMusic(){
+  var audio = document.getElementById('bgMusic');
+  var btn = document.getElementById('musicToggleBtn');
+  var icon = document.getElementById('musicIcon');
+  var label = document.getElementById('musicLabel');
+  audio.volume = 0.3;
+  audio.play().then(function(){
+    musicPlaying = true;
+    icon.textContent='🔊'; label.textContent='إيقاف';
+    btn.classList.add('playing');
+    localStorage.setItem('postman_music','on');
+  }).catch(function(){});
+}
+function pauseMusic(){
+  var audio = document.getElementById('bgMusic');
+  var btn = document.getElementById('musicToggleBtn');
+  var icon = document.getElementById('musicIcon');
+  var label = document.getElementById('musicLabel');
+  audio.pause();
+  musicPlaying = false;
+  icon.textContent='🔇'; label.textContent='موسيقى';
+  btn.classList.remove('playing');
+  localStorage.setItem('postman_music','off');
+}
+document.getElementById('musicToggleBtn').addEventListener('click', function(){
+  if(musicPlaying) pauseMusic(); else playMusic();
+});
+
+/* ══ USER PROFILE / AVATAR ══ */
+function loadUserProfile(){
+  db.ref('postman_users/'+currentUser.key).on('value', function(snap){
+    if(!snap.exists()) return;
+    var u = snap.val();
+    var headerImg = document.getElementById('userAvatarImg');
+    var bigImg = document.getElementById('profileAvatarBig');
+    if(u.avatarUrl){
+      headerImg.src = u.avatarUrl; headerImg.removeAttribute('style');
+      bigImg.src = u.avatarUrl;
+    } else {
+      headerImg.src=''; headerImg.style.display='none';
+      bigImg.src='';
+    }
+    document.getElementById('profileNameDisplay').textContent = u.displayName || currentUser.name;
+    document.getElementById('avatarUrlInput').value = u.avatarUrl || '';
+  });
+}
+
+document.getElementById('saveAvatarBtn').addEventListener('click', async function(){
+  var url = document.getElementById('avatarUrlInput').value.trim();
+  this.disabled = true; this.textContent='جارٍ الحفظ...';
+  try{
+    await db.ref('postman_users/'+currentUser.key+'/avatarUrl').set(url || null);
+    toast('✅ تم تحديث صورتك الرمزية');
+  }catch(e){
+    toast('⚠ حدث خطأ، حاول مجدداً');
+  }
+  this.disabled = false; this.textContent='💾 حفظ الصورة الرمزية';
+});
+
+document.getElementById('removeAvatarBtn').addEventListener('click', async function(){
+  document.getElementById('avatarUrlInput').value='';
+  try{
+    await db.ref('postman_users/'+currentUser.key+'/avatarUrl').set(null);
+    toast('✅ تمت إزالة الصورة الرمزية');
+  }catch(e){
+    toast('⚠ حدث خطأ');
+  }
+});
+
+tryAutoLogin();
+
+/* ══ PASSWORD RECOVERY ══ */
+document.getElementById('showRecoveryBtn').addEventListener('click', function(){
+  document.getElementById('loginBoxNormal').classList.add('hidden');
+  document.getElementById('loginBoxRecovery').classList.remove('hidden');
+  document.getElementById('recoveryErr').textContent='';
+  document.getElementById('recoveryQuestionBox').classList.add('hidden');
+  document.getElementById('recoveryStatusBox').classList.add('hidden');
+  document.getElementById('recoveryNewPassBox').classList.add('hidden');
+  document.getElementById('recoveryName').value='';
+  document.getElementById('recoveryBtn').textContent='التحقق من الاسم';
+  document.getElementById('recoveryBtn').dataset.step='check';
+});
+document.getElementById('showLoginFromRecovery').addEventListener('click', function(){
+  document.getElementById('loginBoxRecovery').classList.add('hidden');
+  document.getElementById('loginBoxNormal').classList.remove('hidden');
+});
+
+var recoveryStep = 'check'; // check → send → status
+document.getElementById('recoveryBtn').addEventListener('click', async function(){
+  var step = this.dataset.step || 'check';
+  var errEl = document.getElementById('recoveryErr');
+  errEl.textContent='';
+  var name = document.getElementById('recoveryName').value.trim();
+  if(!name){ errEl.textContent='أدخل اسمك أولاً'; return; }
+  var key = nameKey(name);
+  this.disabled=true;
+
+  if(step==='check'){
+    this.textContent='جارٍ التحقق...';
+    try{
+      var snap = await db.ref('postman_users/'+key).get();
+      if(!snap.exists()){ errEl.textContent='لم يُعثر على هذا الاسم'; this.disabled=false; this.textContent='التحقق من الاسم'; return; }
+      var userData = snap.val();
+      if(!userData.secretQuestion){ errEl.textContent='لم يتم تسجيل سؤال سري لهذا الحساب، تواصل مع المشرف'; this.disabled=false; this.textContent='التحقق من الاسم'; return; }
+      // عرض السؤال
+      document.getElementById('recoveryQuestionText').textContent = userData.secretQuestionLabel || userData.secretQuestion;
+      document.getElementById('recoveryQuestionBox').classList.remove('hidden');
+      // فحص هل يوجد طلب سابق
+      var reqSnap = await db.ref('postman_recovery/'+key).get();
+      if(reqSnap.exists()){
+        var req = reqSnap.val();
+        if(req.status==='approved' && req.newPass){
+          document.getElementById('recoveryStatusBox').innerHTML='✅ <b>تم اعتماد طلبك</b><br><small>أدخل إجابة سؤالك السري لعرض كلمة مرورك الجديدة</small>';
+          document.getElementById('recoveryStatusBox').style.cssText='border-radius:11px;padding:12px 15px;margin-bottom:14px;font-size:.82rem;line-height:1.7;text-align:center;background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.35);color:#90d494;display:block';
+          this.textContent='عرض كلمة المرور الجديدة';
+          this.dataset.step='reveal';
+        } else {
+          document.getElementById('recoveryStatusBox').innerHTML='⏳ <b>قيد الإجراء</b><br><small>طلبك قيد المراجعة من المشرف، يرجى المراجعة لاحقاً</small>';
+          document.getElementById('recoveryStatusBox').style.cssText='border-radius:11px;padding:12px 15px;margin-bottom:14px;font-size:.82rem;line-height:1.7;text-align:center;background:rgba(240,192,96,.08);border:1px solid rgba(240,192,96,.3);color:rgba(240,192,96,.9);display:block';
+          this.textContent='إرسال طلب جديد';
+          this.dataset.step='send';
+        }
+      } else {
+        this.textContent='إرسال طلب الاستعادة';
+        this.dataset.step='send';
+      }
+      this.disabled=false;
+    }catch(e){ errEl.textContent='خطأ في الاتصال'; this.disabled=false; this.textContent='التحقق من الاسم'; }
+
+  } else if(step==='send'){
+    var answer = document.getElementById('recoveryAnswer').value.trim().toLowerCase();
+    if(!answer){ errEl.textContent='أدخل إجابة السؤال السري'; this.disabled=false; return; }
+    this.textContent='جارٍ الإرسال...';
+    try{
+      var snap = await db.ref('postman_users/'+key).get();
+      var userData = snap.val();
+      await db.ref('postman_recovery/'+key).set({
+        displayName: userData.displayName,
+        secretQuestion: userData.secretQuestionLabel || userData.secretQuestion,
+        secretAnswerRegistered: userData.secretAnswer,
+        secretAnswerProvided: answer,
+        status: 'pending',
+        newPass: null,
+        requestedAt: firebase.database.ServerValue.TIMESTAMP
+      });
+      document.getElementById('recoveryStatusBox').innerHTML='⏳ <b>قيد الإجراء</b><br><small>طلبك قيد المراجعة من المشرف، يرجى المراجعة لاحقاً</small>';
+      document.getElementById('recoveryStatusBox').style.cssText='border-radius:11px;padding:12px 15px;margin-bottom:14px;font-size:.82rem;line-height:1.7;text-align:center;background:rgba(240,192,96,.08);border:1px solid rgba(240,192,96,.3);color:rgba(240,192,96,.9);display:block';
+      document.getElementById('recoveryQuestionBox').classList.add('hidden');
+      this.textContent='تم إرسال الطلب ✅';
+      this.dataset.step='done';
+      this.disabled=true;
+    }catch(e){ errEl.textContent='خطأ في الإرسال'; this.disabled=false; this.textContent='إرسال طلب الاستعادة'; }
+
+  } else if(step==='reveal'){
+    var answer = document.getElementById('recoveryAnswer').value.trim().toLowerCase();
+    if(!answer){ errEl.textContent='أدخل إجابة السؤال السري'; this.disabled=false; return; }
+    this.textContent='جارٍ التحقق...';
+    try{
+      var snap = await db.ref('postman_users/'+key).get();
+      var userData = snap.val();
+      if(answer !== userData.secretAnswer){ errEl.textContent='إجابة السؤال السري غير صحيحة'; this.disabled=false; this.textContent='عرض كلمة المرور الجديدة'; return; }
+      var reqSnap = await db.ref('postman_recovery/'+key).get();
+      var req = reqSnap.val();
+      if(req.status==='approved' && req.newPass){
+        document.getElementById('recoveryNewPassValue').textContent = req.newPass;
+        document.getElementById('recoveryNewPassBox').classList.remove('hidden');
+        document.getElementById('recoveryStatusBox').classList.add('hidden');
+        this.textContent='تسجيل الدخول الآن';
+        this.dataset.step='login';
+      }
+      this.disabled=false;
+    }catch(e){ errEl.textContent='خطأ في الاتصال'; this.disabled=false; this.textContent='عرض كلمة المرور الجديدة'; }
+
+  } else if(step==='login'){
+    document.getElementById('loginBoxRecovery').classList.add('hidden');
+    document.getElementById('loginBoxNormal').classList.remove('hidden');
+    document.getElementById('loginName').value = name;
+    this.disabled=false;
+  }
+});
+
+/* ══ CONTACT ══ */
+// من شاشة الدخول
+document.getElementById('showContactBtn').addEventListener('click', function(){
+  document.getElementById('loginBoxNormal').classList.add('hidden');
+  document.getElementById('loginBoxContact').classList.remove('hidden');
+  document.getElementById('contactErr').textContent='';
+});
+document.getElementById('showLoginFromContact').addEventListener('click', function(){
+  document.getElementById('loginBoxContact').classList.add('hidden');
+  document.getElementById('loginBoxNormal').classList.remove('hidden');
+});
+document.getElementById('contactSendBtn').addEventListener('click', async function(){
+  var name = document.getElementById('contactName').value.trim() || 'زائر';
+  var msg = document.getElementById('contactMsg').value.trim();
+  var errEl = document.getElementById('contactErr');
+  if(!msg||msg.length<5){ errEl.textContent='اكتب رسالتك أولاً (٥ أحرف على الأقل)'; return; }
+  this.disabled=true; this.textContent='جارٍ الإرسال...';
+  try{
+    await db.ref('postman_contact').push({ name:name, msg:msg, from:'guest', at:firebase.database.ServerValue.TIMESTAMP, status:'unread' });
+    document.getElementById('contactMsg').value='';
+    document.getElementById('contactName').value='';
+    errEl.style.color='#90d494'; errEl.textContent='✅ تم إرسال رسالتك بنجاح';
+    this.textContent='تم الإرسال ✅';
+    setTimeout(function(){ document.getElementById('loginBoxContact').classList.add('hidden'); document.getElementById('loginBoxNormal').classList.remove('hidden'); }, 2000);
+  }catch(e){ errEl.textContent='خطأ في الإرسال'; this.disabled=false; this.textContent='إرسال الرسالة'; }
+});
+
+// من داخل التطبيق
+document.getElementById('openContactAppBtn').addEventListener('click', function(){
+  document.getElementById('contactModal').style.display='flex';
+  document.getElementById('contactAppErr').textContent='';
+  document.getElementById('contactAppMsg').value='';
+});
+document.getElementById('contactAppSendBtn').addEventListener('click', async function(){
+  var msg = document.getElementById('contactAppMsg').value.trim();
+  var errEl = document.getElementById('contactAppErr');
+  if(!msg||msg.length<5){ errEl.textContent='اكتب رسالتك أولاً'; return; }
+  this.disabled=true; this.textContent='جارٍ الإرسال...';
+  try{
+    await db.ref('postman_contact').push({ name:currentUser?currentUser.name:'زائر', msg:msg, from:'member', at:firebase.database.ServerValue.TIMESTAMP, status:'unread' });
+    document.getElementById('contactModal').style.display='none';
+    toast('✅ تم إرسال رسالتك');
+  }catch(e){ errEl.textContent='خطأ في الإرسال'; this.disabled=false; this.textContent='إرسال'; }
+});
+
+/* ══ ENTERTAIN ══ */
+function loadEntertain(){
+  db.ref('postman_entertain').on('value', function(snap){
+    var grid = document.getElementById('entertainGrid');
+    var empty = document.getElementById('entertainEmpty');
+    grid.innerHTML='';
+    if(!snap.exists() || snap.numChildren()===0){
+      grid.classList.add('hidden'); empty.classList.remove('hidden'); return;
+    }
+    grid.classList.remove('hidden'); empty.classList.add('hidden');
+    snap.forEach(function(child){
+      var item = child.val();
+      var a = document.createElement('a');
+      a.className='entertain-card-item';
+      a.href=item.url||'#'; a.target='_blank'; a.rel='noopener';
+      a.innerHTML='<img src="'+escapeHtml(item.img||'')+'" onerror="this.style.display=\"none\"" alt=""><div class="e-name">'+escapeHtml(item.name||'')+'</div><div class="e-desc">'+escapeHtml(item.desc||'')+'</div>';
+      grid.appendChild(a);
+    });
+  });
+}
+
+/* ══ AD SPACE ══ */
+function loadAdSpace(){
+  db.ref('postman_settings/adSpace').on('value', function(snap){
+    var section = document.getElementById('adSpaceSection');
+    var inner = document.getElementById('adSpaceInner');
+    if(!snap.exists() || !snap.val() || !snap.val().active){ section.classList.add('hidden'); return; }
+    var ad = snap.val();
+    section.classList.remove('hidden');
+    // إن وجد رابط، يصبح الإعلان كاملاً قابلاً للنقر
+    var tag = ad.link ? 'a' : 'div';
+    var attrs = ad.link ? ' href="'+escapeHtml(ad.link)+'" target="_blank" rel="noopener"' : '';
+    var style = ad.link ? 'display:block;text-decoration:none;cursor:pointer;transition:all .22s' : '';
+    var html = '<'+tag+attrs+' style="'+style+'">';
+    if(ad.imgUrl) html+='<img src="'+escapeHtml(ad.imgUrl)+'" style="width:100%;display:block;border-radius:16px 16px '+(ad.title||ad.text?'0 0':'16px 16px')+';max-height:220px;object-fit:cover" onerror="this.style.display=\'none\'">';
+    if(ad.title||ad.text){
+      html+='<div style="padding:14px 16px;text-align:center">';
+      if(ad.title) html+='<div style="font-family:Amiri,serif;font-style:italic;font-size:1rem;color:#fae080;margin-bottom:6px">'+escapeHtml(ad.title)+'</div>';
+      if(ad.text) html+='<div style="font-size:.78rem;color:rgba(253,244,216,.6);line-height:1.7">'+escapeHtml(ad.text)+'</div>';
+      html+='</div>';
+    }
+    html+='</'+tag+'>';
+    inner.style.cssText='background:linear-gradient(160deg,#1e1008,#160c04);border:1px solid rgba(240,192,96,.22);border-radius:16px;overflow:hidden'+(ad.link?';transition:all .22s':'');
+    if(ad.link){ inner.onmouseover=function(){ inner.style.borderColor='rgba(240,192,96,.5)'; inner.style.transform='translateY(-2px)'; }; inner.onmouseout=function(){ inner.style.borderColor='rgba(240,192,96,.22)'; inner.style.transform=''; }; }
+    inner.innerHTML=html;
+  });
+}
+
+
+/* ══ LIBRARY ══ */
+var booksCache = [];
+var libTab = 'all';
+var libBooks = [
+  {id:'b1',title:'البديل الثالث',author:'ستيفن آر كوفي',type:'other',url:'https://drive.google.com/file/d/13akO0QAkkvfLirkD1RqkklObaueluWpw/preview'},
+  {id:'b2',title:'طرق مختصرة للاحتفاظ بهدوئك',author:'جيل لندنفيلد',type:'other',url:'https://drive.google.com/file/d/1ZRGO8tHRMTuOqqe_GCiL5f8-VftxNSpA/preview'},
+  {id:'b3',title:'قوة الذكاء الروحي',author:'إبراهيم الفقي',type:'other',url:'https://drive.google.com/file/d/16xP8L03383VQoObhY4TUjCdmIbWSOGgc/preview'},
+  {id:'b4',title:'فن التعامل مع الناس',author:'دايل كارنيغي',type:'other',url:'https://drive.google.com/file/d/1swbVzgWkkQAAMyqugHCEJlOdpnMvL2zp/preview'},
+  {id:'b5',title:'أسرار التنويم المغناطيسي الذاتي',author:'آدم إيسون',type:'other',url:'https://drive.google.com/file/d/1TZsAOfsr8IVLHqpoSFdIf19OqEeG_vwl/preview'},
+  {id:'b6',title:'نمِّ قدراتك الذهنية',author:'إبراهيم الفقي',type:'other',url:'https://drive.google.com/file/d/1Hv9BM94aNjI6T5ykKit7SnXafKTrdi_v/preview'},
+  {id:'b7',title:'من أقوال ابن القيم في تطوير الذات',author:'',type:'other',url:'https://drive.google.com/file/d/12TxO6EnUNgoAwjKzLmEK2tvLa0MSAkqQ/preview'},
+  {id:'b8',title:'اعرف نفسك',author:'إبراهيم الفقي',type:'other',url:'https://drive.google.com/file/d/1pIGnJM4lLB-yaDHWAglGIbRVS9TGSVlq/preview'},
+  {id:'b9',title:'ما لا نبوح به',author:'ساندرا سراج',type:'novel',url:'https://drive.google.com/file/d/12w6mRbMW1vnU0kwAVTSz3oIl4MShjoGM/preview'},
+  {id:'b10',title:'قواعد جارتين',author:'عمرو عبد الحميد',type:'novel',url:'https://drive.google.com/file/d/1mJfljoq_0V1E3c1riwE7fWPC_DUFLYYu/preview'},
+  {id:'b11',title:'سمرقند',author:'أمين معلوف',type:'novel',url:'https://drive.google.com/file/d/1b2gM7q1lk60FtGcUWx-2ZKaaF3DHTeod/preview'},
+  {id:'b12',title:'من أساطير الصحراء',author:'إبراهيم الكوني',type:'novel',url:'https://drive.google.com/file/d/1mJfljoq_0V1E3c1riwE7fWPC_DUFLYYu/preview'},
+  {id:'b13',title:'الحب عن بعد',author:'أمين معلوف',type:'novel',url:'https://drive.google.com/file/d/1_4j327XYuqk_hecInnSNmGFCn47zI7rn/preview'},
+  {id:'b14',title:'سلالم الشرق',author:'أمين معلوف',type:'novel',url:'https://drive.google.com/file/d/1sK0i-3vZ_Zie4bc2sojl5dVOnE-DiEI3/preview'},
+  {id:'b15',title:'اختلال العالم',author:'أمين معلوف',type:'novel',url:'https://drive.google.com/file/d/1Hch2yQ1vaAw1X61QXTl39m3p4dn0KHr4/preview'},
+  {id:'b16',title:'التائهون',author:'أمين معلوف',type:'novel',url:'https://drive.google.com/file/d/1Zv1xn-Q2FcMRbyA2dr94NsqXgZZN5qus/preview'},
+];
+
+function setLibTab(tab){
+  libTab = tab;
+  document.querySelectorAll('#libTabAll,#libTabNovel,#libTabOther').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById(tab==='all'?'libTabAll':tab==='novel'?'libTabNovel':'libTabOther').classList.add('active');
+  renderBooks();
+}
+
+function renderBooks(){
+  var q = document.getElementById('librarySearch').value.trim().toLowerCase();
+  var items = libTab==='all' ? libBooks : libBooks.filter(function(b){ return b.type===libTab; });
+  if(q) items = items.filter(function(b){ return b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q); });
+  // مضاف من Firebase
+  var fbItems = booksCache.filter(function(b){
+    if(libTab!=='all' && b.type!==libTab) return false;
+    if(q && !b.title.toLowerCase().includes(q) && !(b.author||'').toLowerCase().includes(q)) return false;
+    return b.status==='approved';
+  });
+  var all = items.concat(fbItems);
+  var grid = document.getElementById('booksGrid');
+  var empty = document.getElementById('booksEmpty');
+  grid.innerHTML='';
+  if(all.length===0){ grid.style.display='none'; empty.classList.remove('hidden'); return; }
+  grid.style.display='grid'; empty.classList.add('hidden');
+  all.forEach(function(book){
+    var card = document.createElement('div');
+    card.className='book-card';
+    card.innerHTML = book.coverUrl
+      ? '<img class="book-cover" src="'+escapeHtml(book.coverUrl)+'" onerror="this.style.display=\'none\'">'
+      : '<div class="book-cover-placeholder">📖</div>';
+    card.innerHTML += '<div class="book-info"><div class="book-title">'+escapeHtml(book.title)+'</div><div class="book-author">'+escapeHtml(book.author||'')+'</div></div>';
+    card.addEventListener('click', function(){ openBook(book); });
+    grid.appendChild(card);
+  });
+}
+
+function openBook(book){
+  var modal = document.getElementById('bookReaderModal');
+  document.getElementById('bookReaderTitle').textContent = book.title + (book.author?' — '+book.author:'');
+  document.getElementById('bookReaderFrame').src = book.url;
+  document.getElementById('bookDownloadBtn').href = book.url.replace('/preview','').replace('drive.google.com/file/d/','drive.google.com/uc?export=download&id=');
+  modal.classList.add('show');
+}
+
+document.getElementById('librarySearch').addEventListener('input', renderBooks);
+
+document.getElementById('suggestBookBtn').addEventListener('click', function(){
+  document.getElementById('suggestBookModal').classList.add('show');
+});
+
+document.getElementById('suggestBookSendBtn').addEventListener('click', async function(){
+  var title = document.getElementById('sbTitle').value.trim();
+  var author = document.getElementById('sbAuthor').value.trim();
+  var type = document.getElementById('sbType').value;
+  var url = document.getElementById('sbUrl').value.trim();
+  var cover = document.getElementById('sbCover').value.trim();
+  if(!title||!url){ toast('أدخل اسم الكتاب ورابطه'); return; }
+  try{
+    await db.ref('postman_library').push({title,author,type,url,coverUrl:cover,status:'pending',suggestedBy:currentUser.name,suggestedAt:firebase.database.ServerValue.TIMESTAMP});
+    document.getElementById('suggestBookModal').classList.remove('show');
+    document.getElementById('sbTitle').value='';document.getElementById('sbAuthor').value='';document.getElementById('sbUrl').value='';document.getElementById('sbCover').value='';
+    toast('✅ تم إرسال اقتراحك، سيُراجع من الإدارة');
+  }catch(e){ toast('❌ خطأ في الإرسال'); }
+});
+
+function loadLibraryFB(){
+  db.ref('postman_library').on('value', function(snap){
+    booksCache=[];
+    snap.forEach(function(child){ booksCache.push({...child.val(), _id:child.key}); });
+    renderBooks();
+  });
+}
+
+
+
+/* ══ RADIO ══ */
+var radioAudio = null;
+var radioPlaying = false;
+var radioStations = [];
+var radioActiveTab = 'all';
+var radioFavorites = JSON.parse(localStorage.getItem('midad_radio_favs')||'[]');
+var radioCurrentStation = null;
+
+function setRadioTab(tab){
+  radioActiveTab = tab;
+  document.getElementById('radioTabAll').classList.toggle('active', tab==='all');
+  document.getElementById('radioTabFav').classList.toggle('active', tab==='fav');
+  document.getElementById('radioFilterWrap').style.display = tab==='all' ? 'block' : 'none';
+  filterRadioStations();
+}
+
+var radioCustomStations = [];
+
+function loadCustomRadioStations(){
+  db.ref('postman_radio_custom').on('value', function(snap){
+    radioCustomStations = [];
+    if(snap.exists()){
+      snap.forEach(function(child){
+        var r = child.val();
+        if(r.active !== false){
+          radioCustomStations.push({
+            stationuuid: 'custom_'+child.key,
+            name: r.name,
+            url_resolved: r.url,
+            country: r.country||'',
+            custom: true
+          });
+        }
+      });
+    }
+    filterRadioStations();
+  });
+}
+
+function filterRadioStations(){
+  var country = document.getElementById('radioCountryFilter').value;
+  var allStations = radioCustomStations.concat(radioStations);
+  var items;
+  if(radioActiveTab==='fav'){
+    items = allStations.filter(function(s){ return radioFavorites.indexOf(s.stationuuid)!==-1; });
+  } else {
+    items = country ? allStations.filter(function(s){ return s.country===country; }) : allStations;
+  }
+  renderRadioList(items);
+}
+
+function renderRadioList(items){
+  var list = document.getElementById('radioStationsList');
+  list.innerHTML='';
+  if(items.length===0){
+    list.innerHTML='<div style="text-align:center;font-size:.75rem;color:rgba(240,192,96,.35);padding:20px">'+(radioActiveTab==='fav'?'لا توجد محطات مفضلة بعد':'لا توجد محطات لهذا الاختيار')+'</div>';
+    return;
+  }
+  items.forEach(function(s){
+    var item = document.createElement('div');
+    item.className='radio-station-item'+(radioCurrentStation&&radioCurrentStation.stationuuid===s.stationuuid?' active':'');
+    var isFav = radioFavorites.indexOf(s.stationuuid)!==-1;
+    item.innerHTML=
+      '<span class="radio-station-dot"></span>'+
+      '<span class="radio-station-name">'+escapeHtml(s.name)+'</span>'+
+      '<span class="radio-station-country">'+escapeHtml(s.country||'')+'</span>'+
+      '<button class="radio-station-fav'+(isFav?' active':'')+'" data-uuid="'+s.stationuuid+'" title="'+(isFav?'إزالة من المفضلة':'إضافة للمفضلة')+'">⭐</button>';
+    item.querySelector('.radio-station-name').addEventListener('click', function(){
+      playRadioStation(s);
+      document.querySelectorAll('.radio-station-item').forEach(function(el){ el.classList.remove('active'); });
+      item.classList.add('active');
+    });
+    item.querySelector('.radio-station-dot').addEventListener('click', function(){
+      playRadioStation(s);
+      document.querySelectorAll('.radio-station-item').forEach(function(el){ el.classList.remove('active'); });
+      item.classList.add('active');
+    });
+    item.querySelector('.radio-station-fav').addEventListener('click', function(e){
+      e.stopPropagation();
+      var uuid = s.stationuuid;
+      var idx = radioFavorites.indexOf(uuid);
+      if(idx===-1){ radioFavorites.push(uuid); this.classList.add('active'); this.title='إزالة من المفضلة'; }
+      else{ radioFavorites.splice(idx,1); this.classList.remove('active'); this.title='إضافة للمفضلة'; }
+      localStorage.setItem('midad_radio_favs', JSON.stringify(radioFavorites));
+      if(radioActiveTab==='fav') filterRadioStations();
+    });
+    list.appendChild(item);
+  });
+}
+
+document.getElementById('radioFabBtn').addEventListener('click', function(){
+  var panel = document.getElementById('radioPanel');
+  var mini = document.getElementById('radioMini');
+  if(mini.classList.contains('show')){ mini.classList.remove('show'); panel.classList.add('show'); return; }
+  panel.classList.toggle('show');
+  if(panel.classList.contains('show') && radioStations.length===0) loadRadioStations();
+});
+
+document.getElementById('radioMinimizeBtn').addEventListener('click', function(){
+  document.getElementById('radioPanel').classList.remove('show');
+  if(radioPlaying){ document.getElementById('radioMini').classList.add('show'); }
+});
+
+document.getElementById('radioMini').addEventListener('click', function(){
+  this.classList.remove('show');
+  document.getElementById('radioPanel').classList.add('show');
+});
+
+document.getElementById('radioCloseBtn').addEventListener('click', function(){
+  if(radioAudio){ radioAudio.pause(); radioAudio=null; radioPlaying=false; radioCurrentStation=null; }
+  document.getElementById('radioFabBtn').classList.remove('playing');
+  document.getElementById('radioDisc').classList.remove('spin');
+  document.getElementById('radioNowName').textContent='اختر محطة...';
+  document.getElementById('radioNowCountry').textContent='';
+  document.getElementById('radioMini').classList.remove('show');
+});
+
+document.getElementById('radioVolume').addEventListener('input', function(){
+  if(radioAudio) radioAudio.volume = this.value/100;
+});
+
+function loadRadioStations(){
+  var list = document.getElementById('radioStationsList');
+  list.innerHTML='<div style="text-align:center;font-size:.75rem;color:rgba(240,192,96,.4);padding:20px">جارٍ تحميل المحطات...</div>';
+  fetch('https://de1.api.radio-browser.info/json/stations/search?language=arabic&limit=200&hidebroken=true&order=votes&reverse=true')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      radioStations = data.filter(function(s){ return s.url_resolved && s.url_resolved.startsWith('http'); });
+      filterRadioStations();
+    })
+    .catch(function(){
+      list.innerHTML='<div style="text-align:center;font-size:.75rem;color:#f08080;padding:20px">تعذّر تحميل المحطات</div>';
+    });
+}
+
+function playRadioStation(s){
+  if(radioAudio){ radioAudio.pause(); radioAudio=null; }
+  radioCurrentStation = s;
+  radioAudio = new Audio(s.url_resolved);
+  radioAudio.volume = document.getElementById('radioVolume').value/100;
+  radioAudio.play().catch(function(){});
+  radioPlaying = true;
+  document.getElementById('radioFabBtn').classList.add('playing');
+  document.getElementById('radioDisc').classList.add('spin');
+  document.getElementById('radioNowName').textContent = s.name;
+  document.getElementById('radioNowCountry').textContent = s.country||'';
+  document.getElementById('radioMiniName').textContent = s.name;
+}
+
+
+
+/* ══ SURPRISE BOX ══ */
+var SURPRISES_GOOD = ["شيك بمليون ريال 💰","باقة ورد 🌹","سيارة فيراري 🏎️","مفتاح قصر خاص 🏰","يخت فاخر ⛵","طائرة خاصة ✈️","جزيرة خاصة 🏝️","خاتم ألماس 💍","ساعة فاخرة ⌚","هاتف ذكي جديد 📱","جهاز ألعاب 🎮","لابتوب احترافي 💻","تلفاز 100 بوصة 📺","كرسي ألعاب فاخر 🪑","كاميرا احترافية 📷","سماعات لاسلكية 🎧","سيارة رياضية 🏎️","سيارة دفع رباعي 🚙","دراجة نارية 🏍️","دراجة هوائية كهربائية 🚲","رحلة حول العالم 🌍","رحلة إلى المالديف 🏖️","تذكرة درجة أولى 🥇","إقامة في فندق 7 نجوم 🌟","قسيمة تسوق مفتوحة 🛍️","صندوق مجوهرات 💎","سبائك ذهب 🥇","صندوق شوكولاتة فاخر 🍫","عطر فاخر 🌸","حقيبة سفر فاخرة 🧳","بيت على البحر 🏠","مزرعة خاصة 🌾","مسبح خاص 🏊","غرفة سينما منزلية 🎬","مكتبة ضخمة 📚","روبوت مساعد 🤖","كوب قهوة سحري لا يبرد ☕","كنز من العملات الذهبية 💰","خزنة مليئة بالنقود 💵","بطاقة VIP مدى الحياة 👑","وجبة من مطعمك المفضل 🍽️","بيتزا عملاقة 🍕","قالب كعكة فاخر 🎂","صندوق مفاجآت 🎁","أمنية تتحقق ⭐","إجازة شهر مدفوعة 🏖️","يوم بلا مسؤوليات 😌","وسام التميز 🏅","مفتاح سيارة أحلامك 🔑","هدية غامضة 🎀"];
+var SURPRISES_FUNNY = ["ضب 🦎","صرصور 🪳","فردة حذاء مهترئة 👟","سمكة فاسدة 🐟","حفاظ مستخدم 🤮","علكة معلوكة 🤢","موزة متعفنة 🍌","بصلة 🧅","كيس قمامة 🗑️","جوارب مثقوبة 🧦","شبشب مقطوع 🩴","بطارية منتهية 🔋","شاحن لا يشحن 🔌","قلم بلا حبر 🖊️","كوب مثقوب ☕","ريموت بلا بطاريات 📺","مفتاح لا يفتح شيئاً 🔑","كيس هواء 💨","حجر عادي 🪨","قالب ثلج ذائب 🧊","بيضة مكسورة 🥚","قطعة خبز يابسة 🍞","كرتون حليب فارغ 🥛","عظمة دجاج 🍗","قشرة موز 🍌","ملعقة مثنية 🥄","سلك متشابك 🔌","فرشاة أسنان مستعملة 🪥","صابونة مستعملة 🧼","وسادة بلا حشوة 🛏️","بطانية مليئة بالغبار 🛏️","حبة بطاطس نابتة 🥔","طماطم متعفنة 🍅","ليمونة يابسة 🍋","حبة ثوم 🧄","كيس بصل 🧅","كيس رمل 🏖️","ذبابة 🪰","بعوضة 🦟","شبشب بمقاسين مختلفين 🩴","فاتورة كهرباء 📄","فاتورة إنترنت 📄","مخالفة مرورية 🚔","واجب منزلي 📝","منبه يرن كل خمس دقائق ⏰","إشعار: تم رفض العملية ❌","اتصال من مديرك في يوم الإجازة 📞","قائمة مهام لا تنتهي 📋","حبة فشار غير مفرقعة 🍿","صندوق فارغ 📦"];
+var ALL_SURPRISES = SURPRISES_GOOD.concat(SURPRISES_FUNNY);
+
+var surpriseTab = 'inbox';
+function setSurpriseTab(tab){
+  surpriseTab=tab;
+  document.getElementById('surpriseInboxFeed').style.display=tab==='inbox'?'block':'none';
+  document.getElementById('surpriseSentFeed').style.display=tab==='sent'?'block':'none';
+  document.getElementById('surpriseTabInbox').classList.toggle('active',tab==='inbox');
+  document.getElementById('surpriseTabSent').classList.toggle('active',tab==='sent');
+}
+
+function loadSurprises(){
+  var key = currentUser.key;
+  // واردة
+  db.ref('postman_surprises').orderByChild('toKey').equalTo(key).on('value', function(snap){
+    var feed = document.getElementById('surpriseInboxFeed');
+    feed.innerHTML='';
+    // تحديث الـ badge
+    var unopened = 0;
+    if(snap.exists()){ snap.forEach(function(c){ if(!c.val().opened) unopened++; }); }
+    var badge = document.getElementById('surpriseBadge');
+    if(badge){ if(unopened>0){ badge.textContent=unopened; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); } }
+    if(!snap.exists()){ feed.innerHTML='<div class="empty-state"><div class="empty-icon">🎁</div><div class="empty-text">لا توجد مفاجآت بعد</div></div>'; return; }
+    var items=[]; snap.forEach(function(c){ items.unshift({...c.val(),_id:c.key}); });
+    items.forEach(function(s){
+      var div=document.createElement('div');
+      div.className='surprise-tile';
+      if(s.opened){
+        div.innerHTML='<div style="font-size:.7rem;color:rgba(240,192,96,.5);margin-bottom:6px">من: '+(s.showSender?escapeHtml(s.fromName):'مجهول')+'</div><div class="surprise-reveal"><span class="surprise-reveal-icon">'+escapeHtml(s.content||'🎁')+'</span><div class="surprise-reveal-name" style="font-size:.95rem">'+escapeHtml(s.contentName||'')+'</div></div><div style="display:flex;gap:7px;justify-content:center;margin-top:10px"><button class="surp-share-btn" data-id="'+s._id+'" data-name="'+escapeHtml(s.contentName||'')+'" data-emoji="'+escapeHtml(s.content||'')+'" data-from="'+(s.showSender?escapeHtml(s.fromName):'مجهول')+'" style="background:rgba(240,192,96,.1);border:1px solid rgba(240,192,96,.3);border-radius:8px;padding:5px 12px;color:#fae080;font-size:.72rem;cursor:pointer">📢 مشاركة</button><button class="surp-del-inbox-btn" data-id="'+s._id+'" style="background:rgba(229,115,115,.1);border:1px solid rgba(229,115,115,.3);border-radius:8px;padding:5px 12px;color:#f08080;font-size:.72rem;cursor:pointer">🗑 حذف</button></div>';
+      } else {
+        var eid = s._id;
+        div.innerHTML='<div style="font-size:.7rem;color:rgba(240,192,96,.5);margin-bottom:6px">هدية سرية 🎁</div><span class="surprise-box-icon">🎁</span><div style="font-size:.82rem;color:rgba(253,244,216,.7);margin-bottom:10px;font-style:italic;font-family:Amiri,serif">صندوق مفاجآت بانتظارك...</div>';
+        var openBtn = document.createElement('button');
+        openBtn.className='surprise-open-btn';
+        openBtn.textContent='✨ افتح المفاجأة';
+        (function(rid){ openBtn.addEventListener('click',function(e){ e.stopPropagation(); openSurpriseBox(this,rid); }); })(eid);
+        div.appendChild(openBtn);
+        if(false){ (async function(){
+          var rid = eid;
+          var snap2 = await db.ref('postman_surprises/'+rid).get();
+          var s2 = snap2.val();
+          var content = ALL_SURPRISES[Math.floor(Math.random()*ALL_SURPRISES.length)];
+          var parts = content.split(' ');
+          var emoji = parts[parts.length-1];
+          var name = parts.slice(0,-1).join(' ');
+          await db.ref('postman_surprises/'+rid).update({opened:true,content:emoji,contentName:name,openedAt:firebase.database.ServerValue.TIMESTAMP});
+          toast('🎁 فتحت المفاجأة!');
+        })(); }
+      }
+      feed.appendChild(div);
+    });
+  });
+  // مرسلة
+  db.ref('postman_surprises').orderByChild('fromKey').equalTo(key).on('value', function(snap){
+    var feed = document.getElementById('surpriseSentFeed');
+    feed.innerHTML='';
+    if(!snap.exists()){ feed.innerHTML='<div class="empty-state"><div class="empty-icon">🎁</div><div class="empty-text">لم ترسل أي مفاجأة بعد</div></div>'; return; }
+    var items=[]; snap.forEach(function(c){ items.unshift({...c.val(),_id:c.key}); });
+    items.forEach(function(s){
+      var div=document.createElement('div');
+      div.className='surprise-tile';
+      div.innerHTML='<div style="font-size:.7rem;color:rgba(240,192,96,.5);margin-bottom:6px">إلى: '+escapeHtml(s.toName)+'</div>';
+      if(s.opened){
+        div.innerHTML+='<div class="surprise-reveal"><span class="surprise-reveal-icon">'+escapeHtml(s.content||'🎁')+'</span><div class="surprise-reveal-name" style="font-size:.9rem">'+escapeHtml(s.contentName||'')+'</div><div style="font-size:.68rem;color:rgba(240,192,96,.4);margin-top:4px">✅ فُتحت</div></div>';
+      } else {
+        div.innerHTML+='<span style="font-size:2rem">🎁</span><div style="font-size:.78rem;color:rgba(240,192,96,.5);margin-top:6px">بانتظار الفتح...</div>';
+      }
+      feed.appendChild(div);
+    });
+  });
+}
+
+// فتح picker للمفاجآت
+document.addEventListener('click', function(e){
+  var pickerTrigger = e.target && (e.target.id==='openSurprisePickerBtn' || (e.target.closest && e.target.closest('#openSurprisePickerBtn')));
+  if(pickerTrigger){
+    surprisePickerMode = true;
+    surpriseSelectedKey = null;
+    surpriseSelectedName = null;
+    document.getElementById('surprisePickerFooter').style.display='none';
+    document.getElementById('pickerSearch').value='';
+    document.getElementById('pickerModal').classList.add('show');
+    renderPickerList();
+  }
+});
+
+// إرسال المفاجأة
+document.addEventListener('click', async function(e){
+  var sendTrigger = e.target && (e.target.id==='sendSurpriseBtn' || (e.target.closest && e.target.closest('#sendSurpriseBtn')));
+  if(sendTrigger){
+    var toName = document.getElementById('surpriseToInput').value.trim();
+    if(!toName){ toast('⚠ اكتب اسم العضو أو اختره من القائمة'); return; }
+    var btn = e.target;
+    btn.disabled=true; btn.textContent='جارٍ الإرسال...';
+    var showMe = document.getElementById('surpriseShowSender2').checked;
+    try{
+      var toKey=null;
+      var snap = await db.ref('postman_users').get();
+      snap.forEach(function(child){
+        if(child.val().displayName===toName) toKey=child.key;
+      });
+      if(!toKey){ toast('⚠ العضو غير موجود'); btn.disabled=false; btn.textContent='🎁 إرسال مفاجأة'; return; }
+      await db.ref('postman_surprises').push({
+        fromKey:currentUser.key, fromName:currentUser.name,
+        toKey:toKey, toName:toName,
+        showSender:showMe, opened:false,
+        sentAt:firebase.database.ServerValue.TIMESTAMP
+      });
+      document.getElementById('surpriseToInput').value='';
+      document.getElementById('surpriseRecipientStatus').textContent='';
+      toast('🎁 تم إرسال المفاجأة!');
+    }catch(err){
+      toast('❌ خطأ: '+err.message);
+    }
+    btn.disabled=false; btn.textContent='🎁 إرسال مفاجأة';
+  }
+});
+
+document.getElementById('surpriseConfirmFromPicker').addEventListener('click', async function(){
+  if(!surpriseSelectedKey){ toast('اختر عضواً أولاً'); return; }
+  var btn = this;
+  btn.disabled=true; btn.textContent='جارٍ الإرسال...';
+  var showMe = document.getElementById('surpriseShowSender2').checked;
+  try{
+    await db.ref('postman_surprises').push({
+      fromKey:currentUser.key, fromName:currentUser.name,
+      toKey:surpriseSelectedKey, toName:surpriseSelectedName,
+      showSender:showMe, opened:false,
+      sentAt:firebase.database.ServerValue.TIMESTAMP
+    });
+    document.getElementById('pickerModal').classList.remove('show');
+    surprisePickerMode=false;
+    surpriseSelectedKey=null;
+    surpriseSelectedName=null;
+    document.getElementById('surprisePickerFooter').style.display='none';
+    btn.disabled=false; btn.textContent='🎁 إرسال المفاجأة';
+    toast('🎁 تم إرسال المفاجأة!');
+  }catch(e){
+    toast('❌ خطأ: '+e.message);
+    btn.disabled=false; btn.textContent='🎁 إرسال المفاجأة';
+  }
+});
+
+</script>
+
+<!-- Book Reader Modal -->
+<div id="bookReaderModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.92);flex-direction:column" class="">
+  <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(160deg,#1e1008,#100602);border-bottom:1px solid rgba(240,192,96,.15);flex-shrink:0">
+    <button onclick="document.getElementById('bookReaderModal').classList.remove('show');document.getElementById('bookReaderModal').style.display='none';document.getElementById('bookReaderFrame').src=''" style="background:rgba(255,255,255,.06);border:1px solid rgba(240,192,96,.25);border-radius:8px;color:#f0c060;width:34px;height:34px;cursor:pointer;font-size:.9rem;flex-shrink:0">✕</button>
+    <div id="bookReaderTitle" style="font-family:'Amiri',serif;font-size:.9rem;color:#fae080;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+    <a id="bookDownloadBtn" href="#" target="_blank" style="background:linear-gradient(135deg,#6a2e0a,#b05520);border:1px solid rgba(240,192,96,.4);border-radius:8px;padding:6px 12px;color:#fff8e0;font-size:.75rem;text-decoration:none;flex-shrink:0">⬇ تحميل</a>
+  </div>
+  <iframe id="bookReaderFrame" src="" style="flex:1;border:none;width:100%;background:#1a1008"></iframe>
+</div>
+<script>
+document.getElementById('bookReaderModal').addEventListener('click', function(e){ if(e.target===this){ this.classList.remove('show'); this.style.display='none'; document.getElementById('bookReaderFrame').src=''; } });
+document.querySelectorAll('#bookReaderModal').forEach(function(m){ m.addEventListener('transitionend',function(){ if(!m.classList.contains('show')) m.style.display='none'; }); });
+// عند فتح Modal الكتاب
+var origOpenBook = window.openBook;
+window.openBook = function(book){
+  var modal = document.getElementById('bookReaderModal');
+  modal.style.display='flex';
+  document.getElementById('bookReaderTitle').textContent = book.title + (book.author?' — '+book.author:'');
+  document.getElementById('bookReaderFrame').src = book.url;
+  document.getElementById('bookDownloadBtn').href = book.url.replace('/preview','').replace('drive.google.com/file/d/','drive.google.com/uc?export=download&id=');
+};
+</script>
+
+<!-- Suggest Book Modal -->
+<div id="suggestBookModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.85);align-items:center;justify-content:center;padding:18px">
+  <div style="width:100%;max-width:400px;background:linear-gradient(160deg,#1e1008,#100602);border:1px solid rgba(240,192,96,.38);border-radius:20px;padding:22px 18px;position:relative">
+    <button onclick="document.getElementById('suggestBookModal').classList.remove('show');document.getElementById('suggestBookModal').style.display='none'" style="position:absolute;top:10px;left:10px;background:rgba(255,255,255,.06);border:1px solid rgba(240,192,96,.25);border-radius:8px;color:#f0c060;width:30px;height:30px;cursor:pointer">✕</button>
+    <div style="font-family:'Amiri',serif;font-size:1rem;color:#fae080;text-align:center;margin-bottom:14px">📤 اقتراح كتاب</div>
+    <input class="field-input" id="sbTitle" placeholder="اسم الكتاب *" style="margin-bottom:9px">
+    <input class="field-input" id="sbAuthor" placeholder="المؤلف" style="margin-bottom:9px">
+    <select class="field-input" id="sbType" style="margin-bottom:9px;cursor:pointer">
+      <option value="novel">رواية</option>
+      <option value="other">كتاب منوع</option>
+    </select>
+    <input class="field-input" id="sbUrl" placeholder="رابط PDF (Google Drive / OneDrive) *" style="margin-bottom:9px">
+    <input class="field-input" id="sbCover" placeholder="رابط صورة الغلاف (اختياري)" style="margin-bottom:14px">
+    <button id="suggestBookSendBtn" class="submit-btn">إرسال للمراجعة</button>
+  </div>
+</div>
+<script>
+document.getElementById('suggestBookModal').addEventListener('click',function(e){ if(e.target===this){this.classList.remove('show');this.style.display='none';} });
+document.getElementById('suggestBookModal').addEventListener('transitionend',function(){ if(!this.classList.contains('show')) this.style.display='none'; });
+
+function openSurpriseBox(btn, rid){
+  btn.disabled=true;
+  db.ref('postman_surprises_list').once('value', function(snap){
+    var list = snap.exists() ? snap.val() : ALL_SURPRISES;
+    if(!list||list.length===0){ list=ALL_SURPRISES; }
+    var full = list[Math.floor(Math.random()*list.length)];
+    var parts = full.split(' ');
+    var emoji = parts[parts.length-1];
+    var name = parts.slice(0,-1).join(' ');
+    db.ref('postman_surprises/'+rid).update({opened:true,content:emoji,contentName:name,openedAt:firebase.database.ServerValue.TIMESTAMP})
+    .then(function(){ toast('🎁 فتحت المفاجأة!'); })
+    .catch(function(){ btn.disabled=false; });
+  });
+}
+
+function doSendSurprise(btn){
+  var toName = document.getElementById('surpriseToInput').value.trim();
+  var showMe = document.getElementById('surpriseShowSender2').checked;
+  if(!toName){ toast('⚠ اكتب اسم العضو أو اختره'); return; }
+  btn.disabled=true; btn.textContent='جارٍ الإرسال...';
+
+  // إذا اختار من الـ picker استخدم surpriseSelectedKey مباشرة
+  if(surpriseSelectedKey){
+    var key = surpriseSelectedKey;
+    var name = surpriseSelectedName || toName;
+    surpriseSelectedKey = null; surpriseSelectedName = null;
+    db.ref('postman_surprises').push({
+      fromKey:currentUser.key, fromName:currentUser.name,
+      toKey:key, toName:name,
+      showSender:showMe, opened:false,
+      sentAt:firebase.database.ServerValue.TIMESTAMP
+    }).then(function(){
+      document.getElementById('surpriseToInput').value='';
+      document.getElementById('surpriseRecipientStatus') && (document.getElementById('surpriseRecipientStatus').textContent='');
+      btn.disabled=false; btn.textContent='🎁 إرسال مفاجأة';
+      toast('🎁 تم إرسال المفاجأة!');
+    }).catch(function(){ toast('❌ خطأ'); btn.disabled=false; btn.textContent='🎁 إرسال مفاجأة'; });
+    return;
+  }
+
+  // إذا كتب يدوياً ابحث في postman_users
+  db.ref('postman_users').get().then(function(snap){
+    var toKey=null, toNameFinal=toName;
+    snap.forEach(function(child){
+      var u = child.val();
+      if(u.displayName===toName || child.key===toName){ toKey=child.key; toNameFinal=u.displayName||toName; }
+    });
+    if(!toKey){ toast('⚠ العضو غير موجود'); btn.disabled=false; btn.textContent='🎁 إرسال مفاجأة'; return; }
+    db.ref('postman_surprises').push({
+      fromKey:currentUser.key, fromName:currentUser.name,
+      toKey:toKey, toName:toNameFinal,
+      showSender:showMe, opened:false,
+      sentAt:firebase.database.ServerValue.TIMESTAMP
+    }).then(function(){
+      document.getElementById('surpriseToInput').value='';
+      btn.disabled=false; btn.textContent='🎁 إرسال مفاجأة';
+      toast('🎁 تم إرسال المفاجأة!');
+    }).catch(function(){ toast('❌ خطأ'); btn.disabled=false; btn.textContent='🎁 إرسال مفاجأة'; });
+  }).catch(function(){ toast('❌ خطأ'); btn.disabled=false; btn.textContent='🎁 إرسال مفاجأة'; });
+}
+
+
+
+/* ══ SURPRISE EXTRA FUNCTIONS ══ */
+document.addEventListener('click', function(e){
+  // حذف للمستلم
+  var delInbox = e.target.closest('.surp-del-inbox-btn');
+  if(delInbox){ if(!confirm('حذف هذه المفاجأة؟')) return; db.ref('postman_surprises/'+delInbox.dataset.id).remove().then(function(){ toast('🗑 تم الحذف'); }); return; }
+  // حذف للمرسِل
+  var delSent = e.target.closest('.surp-del-sent-btn');
+  if(delSent){ if(!confirm('حذف هذه المفاجأة؟')) return; db.ref('postman_surprises/'+delSent.dataset.id).remove().then(function(){ toast('🗑 تم الحذف'); }); return; }
+  // مشاركة
+  var shareBtn = e.target.closest('.surp-share-btn');
+  if(shareBtn){
+    var name = shareBtn.dataset.name;
+    var emoji = shareBtn.dataset.emoji;
+    var from = shareBtn.dataset.from;
+    db.ref('postman_messages').push({
+      to:'__everyone__', toName:'الجميع',
+      from:currentUser.key, fromName:currentUser.name,
+      content:'<div style="text-align:center;font-size:2.5rem;margin-bottom:6px">'+escapeHtml(emoji)+'</div><div style="text-align:center;font-family:Amiri,serif">فتحت صندوق المفاجآت وكان بداخله: <b>'+escapeHtml(name)+'</b></div>',
+      contentHtml:'<div style="text-align:center;font-size:2.5rem;margin-bottom:6px">'+escapeHtml(emoji)+'</div><div style="text-align:center;font-family:Amiri,serif">فتحت صندوق المفاجآت وكان بداخله: <b>'+escapeHtml(name)+'</b></div>',
+      public:true, approved:false, showSender:true,
+      timestamp:firebase.database.ServerValue.TIMESTAMP,
+      createdAt:firebase.database.ServerValue.TIMESTAMP
+    }).then(function(){ toast('📢 تمت المشاركة — بانتظار الاعتماد'); });
+    return;
+  }
+});
+
+/* حذف تلقائي */
+function cleanupSurprises(){
+  var now = Date.now();
+  var day3 = 3*24*60*60*1000;
+  var day7 = 7*24*60*60*1000;
+  db.ref('postman_surprises').get().then(function(snap){
+    snap.forEach(function(child){
+      var s = child.val();
+      var age = now - (s.sentAt||0);
+      if(s.opened && age > day3) db.ref('postman_surprises/'+child.key).remove();
+      else if(!s.opened && age > day7) db.ref('postman_surprises/'+child.key).remove();
+    });
+  });
+}</script>
+
+    <button class="radio-fab" id="radioFabBtn">📻</button>
+    <div class="radio-mini" id="radioMini">
+      <div class="radio-mini-dot"></div>
+      <span class="radio-mini-name" id="radioMiniName">جارٍ البث...</span>
+      <span style="font-size:.7rem;color:rgba(240,192,96,.4)">▲</span>
+    </div>
+    <div class="radio-panel" id="radioPanel">
+      <div class="radio-panel-header">
+        <span class="radio-panel-title">📻 الراديو العربي</span>
+        <button class="radio-panel-min" id="radioMinimizeBtn">تصغير ▼</button>
+      </div>
+      <div class="radio-now-playing">
+        <div class="radio-now-disc" id="radioDisc">📻</div>
+</body>
+</html>
